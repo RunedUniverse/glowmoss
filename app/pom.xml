@@ -85,6 +85,15 @@
 			<scope>compile</scope>
 		</dependency>
 
+		<dependency>
+			<groupId>net.runeduniverse.lib.rogm</groupId>
+			<artifactId>rogm-core</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>net.runeduniverse.lib.rogm.modules</groupId>
+			<artifactId>rogm-modules-neo4j</artifactId>
+		</dependency>
+
 		<!-- logging utilities-->
 		<dependency>
 			<groupId>net.runeduniverse.lib.utils</groupId>

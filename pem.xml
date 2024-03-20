@@ -1,0 +1,338 @@
+<!--
+
+    Copyright © 2024 VenaNocta (venanocta@gmail.com)
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<project-execution-model
+	xmlns="https://api.runeduniverse.net/runes4tools/r4m-pem"
+	xsi:schemaLocation="https://api.runeduniverse.net/runes4tools/r4m-pem https://api.runeduniverse.net/runes4tools/r4m-pem-v1_0_0.xsd"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<modelVersion>1.0.0</modelVersion>
+	<executions>
+		<!-- general -->
+		<execution source="override" id="default">
+			<triggers>
+				<default />
+			</triggers>
+			<lifecycles>
+				<lifecycle id="help">
+					<phases>
+						<phase id="help">
+							<goals>
+								<goal id="help">
+									<groupId>net.runeduniverse.tools.maven.r4m</groupId>
+									<artifactId>r4m-maven-extension</artifactId>
+									<modes>
+										<default />
+										<dev />
+									</modes>
+								</goal>
+								<goal id="help-tasks">
+									<groupId>net.runeduniverse.tools.maven.r4m</groupId>
+									<artifactId>r4m-maven-extension</artifactId>
+									<modes>
+										<default />
+										<dev />
+									</modes>
+								</goal>
+							</goals>
+						</phase>
+					</phases>
+				</lifecycle>
+				<lifecycle id="clean">
+					<phases>
+						<phase id="clean">
+							<goals>
+								<goal id="clean">
+									<groupId>org.apache.maven.plugins</groupId>
+									<artifactId>maven-clean-plugin</artifactId>
+									<modes>
+										<default />
+										<dev />
+									</modes>
+								</goal>
+							</goals>
+						</phase>
+					</phases>
+				</lifecycle>
+				<lifecycle id="default">
+					<phases>
+						<phase id="validate">
+							<goals>
+								<goal id="format">
+									<modes>
+										<dev />
+									</modes>
+									<groupId>com.mycila</groupId>
+									<artifactId>license-maven-plugin</artifactId>
+								</goal>
+							</goals>
+						</phase>
+						<phase id="verify">
+							<goals>
+								<goal id="sign">
+									<modes>
+										<install />
+									</modes>
+									<groupId>org.apache.maven.plugins</groupId>
+									<artifactId>maven-gpg-plugin</artifactId>
+								</goal>
+							</goals>
+						</phase>
+						<phase id="install">
+							<goals>
+								<goal id="install">
+									<groupId>org.apache.maven.plugins</groupId>
+									<artifactId>maven-install-plugin</artifactId>
+									<modes>
+										<default />
+										<dev />
+									</modes>
+								</goal>
+							</goals>
+						</phase>
+						<phase id="deploy">
+							<goals>
+								<goal id="deploy">
+									<groupId>org.apache.maven.plugins</groupId>
+									<artifactId>maven-deploy-plugin</artifactId>
+									<modes>
+										<deploy />
+									</modes>
+								</goal>
+							</goals>
+						</phase>
+					</phases>
+				</lifecycle>
+				<lifecycle id="site">
+					<phases>
+						<phase id="site">
+							<goals>
+								<goal id="site">
+									<groupId>org.apache.maven.plugins</groupId>
+									<artifactId>maven-site-plugin</artifactId>
+									<modes>
+										<default />
+										<dev />
+									</modes>
+								</goal>
+							</goals>
+						</phase>
+						<phase id="site-deploy">
+							<goals>
+								<goal id="deploy">
+									<groupId>org.apache.maven.plugins</groupId>
+									<artifactId>maven-site-plugin</artifactId>
+									<modes>
+										<default />
+										<dev />
+									</modes>
+								</goal>
+							</goals>
+						</phase>
+					</phases>
+				</lifecycle>
+			</lifecycles>
+		</execution>
+		<!-- packaging-procedure: pom -->
+		<execution source="override" id="signed-pom">
+			<restrictions>
+				<packaging-procedure>pom</packaging-procedure>
+				<packaging-procedure>jar</packaging-procedure>
+			</restrictions>
+			<triggers>
+				<default />
+				<active-profile id="deploy-signed" />
+			</triggers>
+			<lifecycles>
+				<lifecycle id="default">
+					<phases>
+						<phase id="deploy">
+							<goals>
+								<goal id="attach-artifact">
+									<groupId>org.codehaus.mojo</groupId>
+									<artifactId>build-helper-maven-plugin</artifactId>
+									<modes>
+										<deploy-signed />
+									</modes>
+								</goal>
+							</goals>
+						</phase>
+					</phases>
+				</lifecycle>
+			</lifecycles>
+		</execution>
+		<!-- packaging-procedure: jar -->
+		<execution source="override" id="default">
+			<restrictions>
+				<packaging-procedure>jar</packaging-procedure>
+			</restrictions>
+			<triggers>
+				<default />
+			</triggers>
+			<lifecycles>
+				<lifecycle id="default">
+					<phases>
+						<phase id="validate">
+							<goals>
+								<goal id="format">
+									<modes>
+										<dev />
+									</modes>
+									<groupId>net.revelc.code.formatter</groupId>
+									<artifactId>formatter-maven-plugin</artifactId>
+								</goal>
+								<goal id="toolchain">
+									<groupId>org.apache.maven.plugins</groupId>
+									<artifactId>maven-toolchains-plugin</artifactId>
+									<modes>
+										<default />
+										<dev />
+										<install />
+										<junit-jupiter />
+									</modes>
+								</goal>
+							</goals>
+						</phase>
+						<phase id="process-resources">
+							<goals>
+								<goal id="resources">
+									<groupId>org.apache.maven.plugins</groupId>
+									<artifactId>maven-resources-plugin</artifactId>
+									<modes>
+										<default />
+										<dev />
+										<install />
+										<junit-jupiter />
+									</modes>
+								</goal>
+							</goals>
+						</phase>
+						<phase id="compile">
+							<goals>
+								<goal id="compile">
+									<groupId>org.apache.maven.plugins</groupId>
+									<artifactId>maven-compiler-plugin</artifactId>
+									<modes>
+										<default />
+										<dev />
+										<install />
+										<junit-jupiter />
+									</modes>
+								</goal>
+							</goals>
+						</phase>
+						<phase id="process-test-resources">
+							<goals>
+								<goal id="testResources">
+									<groupId>org.apache.maven.plugins</groupId>
+									<artifactId>maven-resources-plugin</artifactId>
+									<modes>
+										<default />
+										<dev />
+										<install />
+										<junit-jupiter />
+									</modes>
+								</goal>
+							</goals>
+						</phase>
+						<phase id="test-compile">
+							<goals>
+								<goal id="testCompile">
+									<groupId>org.apache.maven.plugins</groupId>
+									<artifactId>maven-compiler-plugin</artifactId>
+									<modes>
+										<default />
+										<dev />
+										<install />
+										<junit-jupiter />
+									</modes>
+								</goal>
+							</goals>
+						</phase>
+						<phase id="test">
+							<goals>
+								<goal id="test">
+									<groupId>org.apache.maven.plugins</groupId>
+									<artifactId>maven-surefire-plugin</artifactId>
+									<modes>
+										<dev />
+										<junit-jupiter />
+									</modes>
+								</goal>
+							</goals>
+						</phase>
+						<phase id="package">
+							<goals>
+								<goal id="jar">
+									<groupId>org.apache.maven.plugins</groupId>
+									<artifactId>maven-jar-plugin</artifactId>
+									<modes>
+										<default />
+										<dev />
+										<install />
+										<deploy />
+										<deploy-signed />
+									</modes>
+								</goal>
+								<goal id="jar-no-fork">
+									<modes>
+										<install />
+									</modes>
+									<groupId>org.apache.maven.plugins</groupId>
+									<artifactId>maven-source-plugin</artifactId>
+								</goal>
+								<goal id="jar">
+									<modes>
+										<install />
+									</modes>
+									<groupId>org.apache.maven.plugins</groupId>
+									<artifactId>maven-javadoc-plugin</artifactId>
+								</goal>
+							</goals>
+						</phase>
+					</phases>
+				</lifecycle>
+			</lifecycles>
+		</execution>
+
+		<execution source="override" id="signed-jar">
+			<restrictions>
+				<packaging-procedure>jar</packaging-procedure>
+			</restrictions>
+			<triggers>
+				<default />
+				<active-profile id="deploy-signed" />
+			</triggers>
+			<lifecycles>
+				<lifecycle id="default">
+					<phases>
+						<phase id="deploy">
+							<goals>
+								<goal id="attach-artifact">
+									<groupId>org.codehaus.mojo</groupId>
+									<artifactId>build-helper-maven-plugin</artifactId>
+									<modes>
+										<deploy-signed />
+									</modes>
+								</goal>
+							</goals>
+						</phase>
+					</phases>
+				</lifecycle>
+			</lifecycles>
+		</execution>
+	</executions>
+</project-execution-model>

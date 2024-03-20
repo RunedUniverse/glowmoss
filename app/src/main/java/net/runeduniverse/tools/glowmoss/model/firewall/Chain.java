@@ -13,4 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.runeduniverse.tools.glowmoss.test;
+package net.runeduniverse.tools.glowmoss.model.firewall;
+
+import net.runeduniverse.tools.glowmoss.model.AEntity;
+
+public class Chain extends AEntity {
+
+}

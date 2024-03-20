@@ -40,7 +40,10 @@
 		<!-- VERSIONS -->
 		<artifact-version>0</artifact-version>
 		<!-- ARTIFACT VERSIONS -->
+		<runeduniverse-rogm-core-version>2.1.2</runeduniverse-rogm-core-version>
+		<runeduniverse-rogm-neo4j-version>2.1.2</runeduniverse-rogm-neo4j-version>
 		<runeduniverse-utils-common-version>1.0.1</runeduniverse-utils-common-version>
+		<runeduniverse-utils-async-version>2.1.1</runeduniverse-utils-async-version>
 		<runeduniverse-utils-logging-version>1.0.2</runeduniverse-utils-logging-version>
 		<!-- ARTIFACT VERSIONS - TESTING -->
 	</properties>
@@ -70,12 +73,17 @@
 
 	<dependencyManagement>
 		<dependencies>
-			<!-- Maven Core -->
+			<!-- ROGM CORE -->
 			<dependency>
-				<groupId>org.apache.maven</groupId>
-				<artifactId>maven-core</artifactId>
-				<version>${maven-version}</version>
-				<scope>provided</scope>
+				<groupId>net.runeduniverse.lib.rogm</groupId>
+				<artifactId>rogm-core</artifactId>
+				<version>${runeduniverse-rogm-core-version}</version>
+			</dependency>
+			<!-- Module: Neo4j -->
+			<dependency>
+				<groupId>net.runeduniverse.lib.rogm.modules</groupId>
+				<artifactId>rogm-modules-neo4j</artifactId>
+				<version>${runeduniverse-rogm-neo4j-version}</version>
 			</dependency>
 
 			<!-- UTILS -->
@@ -83,6 +91,11 @@
 				<groupId>net.runeduniverse.lib.utils</groupId>
 				<artifactId>utils-common</artifactId>
 				<version>${runeduniverse-utils-common-version}</version>
+			</dependency>
+			<dependency>
+				<groupId>net.runeduniverse.lib.utils</groupId>
+				<artifactId>utils-async</artifactId>
+				<version>${runeduniverse-utils-async-version}</version>
 			</dependency>
 			<dependency>
 				<groupId>net.runeduniverse.lib.utils</groupId>

@@ -13,4 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.runeduniverse.tools.glowmoss.test;
+package net.runeduniverse.tools.glowmoss.model;
+
+import net.runeduniverse.lib.rogm.annotations.GeneratedValue;
+import net.runeduniverse.lib.rogm.annotations.Id;
+import net.runeduniverse.lib.rogm.annotations.NodeEntity;
+
+@NodeEntity
+public abstract class AEntity {
+
+	@Id
+	@GeneratedValue
+	private Long id;
+
+	public Long getId() {
+		return this.id;
+	}
+}
