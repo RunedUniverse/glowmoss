@@ -276,6 +276,15 @@
 						</phase>
 						<phase id="package">
 							<goals>
+								<goal id="copy-dependencies" optional="true">
+									<groupId>org.apache.maven.plugins</groupId>
+									<artifactId>maven-dependency-plugin</artifactId>
+									<modes>
+										<default />
+										<dev />
+										<install />
+									</modes>
+								</goal>
 								<goal id="jar">
 									<groupId>org.apache.maven.plugins</groupId>
 									<artifactId>maven-jar-plugin</artifactId>

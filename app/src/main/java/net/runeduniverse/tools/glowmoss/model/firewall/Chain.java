@@ -15,8 +15,16 @@
  */
 package net.runeduniverse.tools.glowmoss.model.firewall;
 
+import lombok.Getter;
+import lombok.Setter;
 import net.runeduniverse.tools.glowmoss.model.AEntity;
 
+@Getter
 public class Chain extends AEntity {
+
+	@Setter
+	private String name;
+	@Setter
+	private String table;
 
 }

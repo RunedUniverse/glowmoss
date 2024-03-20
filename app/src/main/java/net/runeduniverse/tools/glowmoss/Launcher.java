@@ -21,21 +21,30 @@ import net.runeduniverse.lib.rogm.modules.neo4j.Neo4jConfiguration;
 import net.runeduniverse.lib.rogm.querying.QueryBuilder;
 import net.runeduniverse.lib.rogm.querying.QueryBuilder.NodeQueryBuilder;
 import net.runeduniverse.lib.rogm.querying.QueryBuilder.RelationQueryBuilder;
+import net.runeduniverse.tools.glowmoss.model.firewall.Chain;
 
 public class Launcher {
 
 	private static Configuration dbCnf;
 	private static QueryBuilder qryBuilder;
 
-	public static void main(String[] args) throws Exception {
+	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 
 		dbCnf = configureDB();
 
-		Session dbSession = Session.create(dbCnf);
+		try (Session dbSession = Session.create(dbCnf)) {
+			qryBuilder = dbSession.getQueryBuilder();
 
-		qryBuilder = dbSession.getQueryBuilder();
+			Chain postrouting = new Chain();
+			postrouting.setName("POSTROUTING");
+			postrouting.setTable("NAT");
 
+			dbSession.save(postrouting);
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	private static NodeQueryBuilder qryNode() {
@@ -47,7 +56,7 @@ public class Launcher {
 	}
 
 	private static Configuration configureDB() {
-		Neo4jConfiguration dbCnf = new Neo4jConfiguration("localhost");
+		Neo4jConfiguration dbCnf = new Neo4jConfiguration("10.88.0.10");
 		// register model package
 		dbCnf.addPackage("net.runeduniverse.tools.glowmoss.model");
 		dbCnf.addPackage("net.runeduniverse.tools.glowmoss.model.firewall");

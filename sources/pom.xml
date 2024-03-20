@@ -45,7 +45,10 @@
 		<runeduniverse-utils-common-version>1.0.1</runeduniverse-utils-common-version>
 		<runeduniverse-utils-async-version>2.1.1</runeduniverse-utils-async-version>
 		<runeduniverse-utils-logging-version>1.0.2</runeduniverse-utils-logging-version>
+		<runeduniverse-utils-scanner-version>1.0.6</runeduniverse-utils-scanner-version>
 		<!-- ARTIFACT VERSIONS - TESTING -->
+		<!-- ARTIFACT VERSIONS - COMPILER -->
+		<lombok-version>1.18.32</lombok-version>
 	</properties>
 
 
@@ -78,6 +81,12 @@
 				<groupId>net.runeduniverse.lib.rogm</groupId>
 				<artifactId>rogm-core</artifactId>
 				<version>${runeduniverse-rogm-core-version}</version>
+				<exclusions>
+					<exclusion>
+						<groupId>net.runeduniverse.lib.utils</groupId>
+						<artifactId>utils-scanner</artifactId>
+					</exclusion>
+				</exclusions>
 			</dependency>
 			<!-- Module: Neo4j -->
 			<dependency>
@@ -102,8 +111,19 @@
 				<artifactId>utils-logging</artifactId>
 				<version>${runeduniverse-utils-logging-version}</version>
 			</dependency>
+			<dependency>
+				<groupId>net.runeduniverse.lib.utils</groupId>
+				<artifactId>utils-scanner</artifactId>
+				<version>${runeduniverse-utils-scanner-version}</version>
+			</dependency>
 
 			<!-- COMPILER -->
+			<dependency>
+				<groupId>org.projectlombok</groupId>
+				<artifactId>lombok</artifactId>
+				<version>${lombok-version}</version>
+				<scope>provided</scope>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
 
