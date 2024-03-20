@@ -54,8 +54,8 @@ public class Launcher {
 		// set classloader
 		dbCnf.addClassLoader(Launcher.class.getClassLoader());
 		// set credentials
-		dbCnf.setUser("glowmoss");
-		dbCnf.setPassword("<password>");
+		dbCnf.setUser("neo4j");
+		dbCnf.setPassword("glowmoss");
 		return dbCnf;
 	}
 
