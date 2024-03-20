@@ -13,27 +13,36 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.runeduniverse.tools.glowmoss.model.firewall;
+package net.runeduniverse.tools.glowmoss.model.server;
+
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 import lombok.Getter;
 import lombok.Setter;
 import net.runeduniverse.lib.rogm.annotations.Direction;
-import net.runeduniverse.lib.rogm.annotations.NodeEntity;
 import net.runeduniverse.lib.rogm.annotations.Relationship;
 import net.runeduniverse.tools.glowmoss.model.AEntity;
-import net.runeduniverse.tools.glowmoss.model.server.Host;
+import net.runeduniverse.tools.glowmoss.model.firewall.Chain;
 
 @Getter
-@NodeEntity(label = "FW_CHAIN")
-public class Chain extends AEntity {
+public class Host extends AEntity {
 
 	@Setter
-	private String name;
-	@Setter
-	private String table;
+	private String hostname;
+
+	@Relationship(direction = Direction.OUTGOING)
+	private Set<Host> virtualHosts = new LinkedHashSet<>();
 
 	@Setter
-	@Relationship(direction = Direction.INCOMING, label = "has_FW_CHAIN")
-	private Host host;
+	private Boolean isContainer;
+
+	@Relationship(direction = Direction.OUTGOING, label = "has_FW_CHAIN")
+	private Set<Chain> firewallChains = new LinkedHashSet<>();
+
+	public void addFwChain(Chain chain) {
+		this.firewallChains.add(chain);
+		chain.setHost(this);
+	}
 
 }

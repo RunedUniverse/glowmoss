@@ -22,6 +22,7 @@ import net.runeduniverse.lib.rogm.querying.QueryBuilder;
 import net.runeduniverse.lib.rogm.querying.QueryBuilder.NodeQueryBuilder;
 import net.runeduniverse.lib.rogm.querying.QueryBuilder.RelationQueryBuilder;
 import net.runeduniverse.tools.glowmoss.model.firewall.Chain;
+import net.runeduniverse.tools.glowmoss.model.server.Host;
 
 public class Launcher {
 
@@ -36,15 +37,44 @@ public class Launcher {
 		try (Session dbSession = Session.create(dbCnf)) {
 			qryBuilder = dbSession.getQueryBuilder();
 
-			Chain postrouting = new Chain();
-			postrouting.setName("POSTROUTING");
-			postrouting.setTable("NAT");
-
-			dbSession.save(postrouting);
+			initHost(dbSession);
 
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+
+	private static void initHost(Session session) {
+		Host host = getHost(session, "rocky-vm");
+
+		Chain postRt = new Chain();
+		postRt.setName("POSTROUTING");
+		postRt.setTable("NAT");
+		Chain preRt = new Chain();
+		preRt.setName("PREROUTING");
+		preRt.setTable("NAT");
+
+		host.addFwChain(postRt);
+		host.addFwChain(preRt);
+
+		session.saveAll(host.getFirewallChains());
+		session.save(host, 7);
+	}
+
+	@SuppressWarnings("deprecation")
+	private static Host getHost(Session session, String hostname) {
+		Host host = session.load(qryNode().where(Host.class)
+				.whereParam("hostname", hostname)
+				.setLazy(true)
+				.asRead()
+				.getResult());
+		if (host == null) {
+			host = new Host();
+			host.setHostname(hostname);
+			return host;
+		}
+		session.resolveLazyLoaded(host);
+		return host;
 	}
 
 	private static NodeQueryBuilder qryNode() {
@@ -56,10 +86,11 @@ public class Launcher {
 	}
 
 	private static Configuration configureDB() {
-		Neo4jConfiguration dbCnf = new Neo4jConfiguration("10.88.0.10");
+		Neo4jConfiguration dbCnf = new Neo4jConfiguration("10.88.0.18");
 		// register model package
 		dbCnf.addPackage("net.runeduniverse.tools.glowmoss.model");
 		dbCnf.addPackage("net.runeduniverse.tools.glowmoss.model.firewall");
+		dbCnf.addPackage("net.runeduniverse.tools.glowmoss.model.server");
 		// set classloader
 		dbCnf.addClassLoader(Launcher.class.getClassLoader());
 		// set credentials
