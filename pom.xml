@@ -108,7 +108,7 @@
 		<profile>
 			<id>format</id>
 			<build>
-				<defaultGoal>[dev/validate]</defaultGoal>
+				<defaultGoal>dev/validate</defaultGoal>
 			</build>
 		</profile>
 		<!-- PIPELINE -->

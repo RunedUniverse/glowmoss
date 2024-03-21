@@ -42,6 +42,9 @@ public class Interface extends AEntity {
 	@Setter
 	private Boolean virtual = true;
 
+	@Relationship(label = "LINKED", direction = Direction.BIDIRECTIONAL)
+	private Set<Interface> links = new LinkedHashSet<>();
+
 	public Set<Interface> getLinks() {
 		return Collections.unmodifiableSet(this.links);
 	}
@@ -74,8 +77,5 @@ public class Interface extends AEntity {
 	@Relationship(label = "CONNECTED_TO", direction = Direction.OUTGOING)
 	@Setter(value = AccessLevel.PROTECTED)
 	private Bridge bridge;
-
-	@Relationship(label = "LINKED", direction = Direction.BIDIRECTIONAL)
-	private Set<Interface> links = new LinkedHashSet<>();
 
 }
