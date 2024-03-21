@@ -62,4 +62,22 @@ public class HasNetworkNamespace extends ARelationEntity {
 			return null;
 		return container.getNamespace();
 	}
+
+	@Override
+	public String toString() {
+		StringBuilder str = new StringBuilder("HasNetworkNamespace: { key: " + this.key + "}, host: ");
+		if (this.host == null) {
+			str.append("null");
+		} else {
+			str.append("{ " + this.host.toString() + " }");
+		}
+		str.append(", namespace: ");
+		if (this.namespace == null) {
+			str.append("null");
+		} else {
+			str.append("{ id:" + this.namespace.getId() + ", ... }");
+		}
+		str.append(" }");
+		return str.toString();
+	}
 }

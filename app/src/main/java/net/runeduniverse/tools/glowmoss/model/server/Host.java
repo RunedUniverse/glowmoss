@@ -41,7 +41,7 @@ public class Host extends AEntity {
 	@Getter
 	private String hostname;
 
-	@Relationship
+	@Relationship(direction = Direction.OUTGOING)
 	private List<HasNetworkNamespace> namespaceRelations = new LinkedList<>();
 	@Transient
 	private Map<Integer, HasNetworkNamespace> namespaceRelationsRef = new LinkedHashMap<>();
@@ -76,20 +76,22 @@ public class Host extends AEntity {
 	}
 
 	public Namespace putNamespace(Integer key, Namespace namespace) {
+		System.out.println("Host.putNamespace()");
+		System.out.println("Namespace:" + namespace.toString());
 		HasNetworkNamespace container;
 		synchronized (this.namespaceRelations) {
 			container = this.namespaceRelationsRef.get(key);
 			if (container == null) {
 				this.namespaceRelationsRef.put(key, container = new HasNetworkNamespace(key, this));
 			}
+			Namespace old = container.getNamespace();
+			if (old != null) {
+				old.setHost(null);
+			}
+			container.setNamespace(namespace);
+			namespace.setHost(container);
+			return old;
 		}
-		Namespace old = container.getNamespace();
-		if (old != null) {
-			old.setHost(null);
-		}
-		container.setNamespace(namespace);
-		namespace.setHost(container);
-		return old;
 	}
 
 	@PostLoad

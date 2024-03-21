@@ -15,10 +15,14 @@
  */
 package net.runeduniverse.tools.glowmoss.model.network;
 
+import java.util.LinkedHashSet;
+import java.util.Set;
 import java.util.UUID;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
+import net.runeduniverse.lib.rogm.annotations.Direction;
 import net.runeduniverse.lib.rogm.annotations.NodeEntity;
 import net.runeduniverse.lib.rogm.annotations.Relationship;
 import net.runeduniverse.tools.glowmoss.model.AEntity;
@@ -26,6 +30,7 @@ import net.runeduniverse.tools.glowmoss.model.server.rel.HasNetworkNamespace;
 
 @Getter
 @NodeEntity(label = "NW_NAMESPACE")
+@ToString
 public class Namespace extends AEntity {
 
 	@Setter
@@ -35,10 +40,36 @@ public class Namespace extends AEntity {
 	private String label = null;
 
 	@Setter
-	@Relationship
+	@Relationship(direction = Direction.INCOMING)
 	private HasNetworkNamespace host;
 
 	@Setter
 	private Boolean net_ipv4_IpForward = false;
+
+	@Relationship(label = "has_NW_INTERFACE", direction = Direction.OUTGOING)
+	private Set<Interface> interfaces = new LinkedHashSet<>();
+
+	public void addInterface(Interface if0) {
+		this.interfaces.add(if0);
+		if0.setNamespace(this);
+	}
+
+	public void removeInterface(Interface if0) {
+		this.interfaces.remove(if0);
+		if0.setNamespace(null);
+	}
+
+	@Relationship(label = "has_NW_BRIDGE", direction = Direction.OUTGOING)
+	private Set<Bridge> bridges = new LinkedHashSet<>();
+
+	public void addBridge(Bridge bridge) {
+		this.bridges.add(bridge);
+		bridge.setNamespace(this);
+	}
+
+	public void removeBridge(Bridge bridge) {
+		this.bridges.remove(bridge);
+		bridge.setNamespace(null);
+	}
 
 }

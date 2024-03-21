@@ -18,6 +18,7 @@ package net.runeduniverse.tools.glowmoss.model.network;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import net.runeduniverse.lib.rogm.annotations.Direction;
@@ -32,11 +33,11 @@ public class Bridge extends AEntity {
 	@Setter
 	private String label;
 
-	@Setter
-	@Relationship
+	@Relationship(label = "has_NW_BRIDGE", direction = Direction.INCOMING)
+	@Setter(value = AccessLevel.PROTECTED)
 	private Namespace namespace;
 
-	@Relationship(label = "CONNECTED_TO", direction = Direction.BIDIRECTIONAL)
+	@Relationship(label = "CONNECTED_TO", direction = Direction.INCOMING)
 	private Set<Interface> interfaces = new LinkedHashSet<>();
 
 	public void addInterface(Interface if0) {

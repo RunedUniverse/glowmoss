@@ -53,16 +53,4 @@ public class NetworkFactory {
 		return b;
 	}
 
-	public static Peer peer(Interface if0, Interface if1) {
-		return peer(null, if0, if1);
-	}
-
-	public static Peer peer(String label, Interface if0, Interface if1) {
-		Peer p = new Peer();
-		p.setLabel(label);
-		p.setIf0(if0);
-		p.setIf1(if1);
-		return p;
-	}
-
 }
