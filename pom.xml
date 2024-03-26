@@ -412,11 +412,6 @@
 					</configuration>
 				</plugin>
 				<plugin>
-					<!-- don't add groupId here it bricks inherited version -->
-					<artifactId>maven-plugin-plugin</artifactId>
-					<version>${maven-plugin-plugin-version}</version>
-				</plugin>
-				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-compiler-plugin</artifactId>
 					<version>${plugin-maven-compiler-version}</version>

@@ -18,14 +18,11 @@ package net.runeduniverse.tools.glowmoss.model.network;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
-import java.util.stream.Collectors;
-
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import net.runeduniverse.lib.rogm.annotations.Direction;
 import net.runeduniverse.lib.rogm.annotations.NodeEntity;
-import net.runeduniverse.lib.rogm.annotations.Property;
 import net.runeduniverse.lib.rogm.annotations.Relationship;
 import net.runeduniverse.tools.glowmoss.model.AEntity;
 

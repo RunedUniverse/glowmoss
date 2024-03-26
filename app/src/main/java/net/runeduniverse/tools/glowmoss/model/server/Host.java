@@ -121,13 +121,13 @@ public class Host extends AEntity {
 	@Getter
 	private Boolean isContainer;
 
-	@Relationship(direction = Direction.OUTGOING, label = "has_FW_CHAIN")
-	@Getter
-	private Set<Chain> firewallChains = new LinkedHashSet<>();
-
-	public void addFwChain(Chain chain) {
-		this.firewallChains.add(chain);
-		chain.setHost(this);
-	}
+	// @Relationship(direction = Direction.OUTGOING, label = "has_FW_CHAIN")
+	// @Getter
+	// private Set<Chain> firewallChains = new LinkedHashSet<>();
+	//
+	// public void addFwChain(Chain chain) {
+	// this.firewallChains.add(chain);
+	// chain.setHost(this);
+	// }
 
 }

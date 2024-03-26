@@ -15,7 +15,6 @@
  */
 package net.runeduniverse.tools.glowmoss.model.firewall;
 
-import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import net.runeduniverse.lib.rogm.annotations.Direction;
@@ -23,30 +22,22 @@ import net.runeduniverse.lib.rogm.annotations.NodeEntity;
 import net.runeduniverse.lib.rogm.annotations.Relationship;
 import net.runeduniverse.tools.glowmoss.model.AEntity;
 
-@NodeEntity(label = "FW_CHAIN")
+@NodeEntity(label = "FW_RULE")
 @Getter
-public class Chain extends AEntity {
+@Setter
+public class Rule extends AEntity {
 
-	@Setter
-	private String name;
-	@Setter
-	private ChainType type;
-	@Setter
-	private Hook hook;
-	@Setter
-	private String hookDevice;
-	@Setter
-	private Integer priority;
-	@Setter
-	private Policy defaultPolicy = Policy.ACCEPT;
-	@Setter
-	private String comment;
+	private String content;
 
-	@Relationship(direction = Direction.INCOMING)
-	@Setter(value = AccessLevel.PACKAGE)
-	private Table table;
+	private Policy policy;
 
-	@Relationship(direction = Direction.OUTGOING, label = "RULES")
-	private Rule nextRule;
+	@Relationship(label = "NEXT", direction = Direction.OUTGOING)
+	private Rule next;
+
+	@Relationship(label = "JUMP", direction = Direction.OUTGOING)
+	private Chain jumpTo;
+
+	@Relationship(label = "GOTO", direction = Direction.OUTGOING)
+	private Rule goTo;
 
 }

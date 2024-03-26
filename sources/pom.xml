@@ -40,12 +40,11 @@
 		<!-- VERSIONS -->
 		<artifact-version>0</artifact-version>
 		<!-- ARTIFACT VERSIONS -->
-		<runeduniverse-rogm-core-version>2.1.2</runeduniverse-rogm-core-version>
+		<runeduniverse-rogm-core-version>2.1.3</runeduniverse-rogm-core-version>
 		<runeduniverse-rogm-neo4j-version>2.1.2</runeduniverse-rogm-neo4j-version>
-		<runeduniverse-utils-common-version>1.0.1</runeduniverse-utils-common-version>
+		<runeduniverse-utils-common-version>1.1.0</runeduniverse-utils-common-version>
 		<runeduniverse-utils-async-version>2.1.1</runeduniverse-utils-async-version>
 		<runeduniverse-utils-logging-version>1.0.2</runeduniverse-utils-logging-version>
-		<runeduniverse-utils-scanner-version>1.0.6</runeduniverse-utils-scanner-version>
 		<!-- ARTIFACT VERSIONS - TESTING -->
 		<!-- ARTIFACT VERSIONS - COMPILER -->
 		<lombok-version>1.18.32</lombok-version>
@@ -81,12 +80,6 @@
 				<groupId>net.runeduniverse.lib.rogm</groupId>
 				<artifactId>rogm-core</artifactId>
 				<version>${runeduniverse-rogm-core-version}</version>
-				<exclusions>
-					<exclusion>
-						<groupId>net.runeduniverse.lib.utils</groupId>
-						<artifactId>utils-scanner</artifactId>
-					</exclusion>
-				</exclusions>
 			</dependency>
 			<!-- Module: Neo4j -->
 			<dependency>
@@ -110,11 +103,6 @@
 				<groupId>net.runeduniverse.lib.utils</groupId>
 				<artifactId>utils-logging</artifactId>
 				<version>${runeduniverse-utils-logging-version}</version>
-			</dependency>
-			<dependency>
-				<groupId>net.runeduniverse.lib.utils</groupId>
-				<artifactId>utils-scanner</artifactId>
-				<version>${runeduniverse-utils-scanner-version}</version>
 			</dependency>
 
 			<!-- COMPILER -->

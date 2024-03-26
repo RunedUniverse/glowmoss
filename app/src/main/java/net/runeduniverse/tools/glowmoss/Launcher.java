@@ -82,17 +82,17 @@ public class Launcher {
 	private static void initHost(Session session) {
 		Host host = getHost(session, "rocky-vm");
 
-		Chain postRt = new Chain();
-		postRt.setName("POSTROUTING");
-		postRt.setTable("NAT");
-		Chain preRt = new Chain();
-		preRt.setName("PREROUTING");
-		preRt.setTable("NAT");
-
-		host.addFwChain(postRt);
-		host.addFwChain(preRt);
-
-		session.saveAll(host.getFirewallChains());
+		// Chain postRt = new Chain();
+		// postRt.setName("POSTROUTING");
+		// postRt.setTable("NAT");
+		// Chain preRt = new Chain();
+		// preRt.setName("PREROUTING");
+		// preRt.setTable("NAT");
+		//
+		// host.addFwChain(postRt);
+		// host.addFwChain(preRt);
+		//
+		// session.saveAll(host.getFirewallChains());
 		session.save(host, 7);
 
 		///////////////////////////////////////////////////////////////////////
@@ -180,7 +180,7 @@ public class Launcher {
 	}
 
 	private static Configuration configureDB() {
-		Neo4jConfiguration dbCnf = new Neo4jConfiguration("10.88.0.4");
+		Neo4jConfiguration dbCnf = new Neo4jConfiguration("10.88.0.2");
 		// register model package
 		dbCnf.addPackage("net.runeduniverse.tools.glowmoss.model");
 		dbCnf.addPackage("net.runeduniverse.tools.glowmoss.model.firewall");

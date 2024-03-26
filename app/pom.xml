@@ -107,10 +107,6 @@
 			<groupId>net.runeduniverse.lib.utils</groupId>
 			<artifactId>utils-logging</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>net.runeduniverse.lib.utils</groupId>
-			<artifactId>utils-scanner</artifactId>
-		</dependency>
 
 		<!-- COMPILER -->
 		<dependency>

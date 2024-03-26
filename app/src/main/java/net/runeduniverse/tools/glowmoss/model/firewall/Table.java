@@ -15,7 +15,9 @@
  */
 package net.runeduniverse.tools.glowmoss.model.firewall;
 
-import lombok.AccessLevel;
+import java.util.LinkedHashSet;
+import java.util.Set;
+
 import lombok.Getter;
 import lombok.Setter;
 import net.runeduniverse.lib.rogm.annotations.Direction;
@@ -23,30 +25,23 @@ import net.runeduniverse.lib.rogm.annotations.NodeEntity;
 import net.runeduniverse.lib.rogm.annotations.Relationship;
 import net.runeduniverse.tools.glowmoss.model.AEntity;
 
-@NodeEntity(label = "FW_CHAIN")
+@NodeEntity(label = "FW_TABLE")
 @Getter
-public class Chain extends AEntity {
+public class Table extends AEntity {
 
 	@Setter
 	private String name;
 	@Setter
-	private ChainType type;
-	@Setter
-	private Hook hook;
-	@Setter
-	private String hookDevice;
-	@Setter
-	private Integer priority;
-	@Setter
-	private Policy defaultPolicy = Policy.ACCEPT;
-	@Setter
-	private String comment;
+	private Family family;
 
-	@Relationship(direction = Direction.INCOMING)
-	@Setter(value = AccessLevel.PACKAGE)
-	private Table table;
+	@Relationship(direction = Direction.OUTGOING)
+	private Set<Chain> chains = new LinkedHashSet<>();
 
-	@Relationship(direction = Direction.OUTGOING, label = "RULES")
-	private Rule nextRule;
+	public boolean addChain(Chain chain) {
+		synchronized (this.chains) {
+			chain.setTable(this);
+			return this.chains.add(chain);
+		}
+	}
 
 }
