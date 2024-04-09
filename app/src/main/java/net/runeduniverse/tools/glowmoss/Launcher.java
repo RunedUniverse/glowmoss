@@ -17,13 +17,17 @@ package net.runeduniverse.tools.glowmoss;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Logger;
 
 import net.runeduniverse.lib.rogm.Configuration;
 import net.runeduniverse.lib.rogm.Session;
+import net.runeduniverse.lib.rogm.errors.ScannerException;
 import net.runeduniverse.lib.rogm.lang.Language.IMapper;
 import net.runeduniverse.lib.rogm.modules.neo4j.Neo4jConfiguration;
+import net.runeduniverse.lib.rogm.pattern.Archive;
+import net.runeduniverse.lib.rogm.pattern.IPattern;
 import net.runeduniverse.lib.rogm.pipeline.DatabasePipelineFactory;
 import net.runeduniverse.lib.rogm.pipeline.Pipeline;
 import net.runeduniverse.lib.rogm.pipeline.chain.Chains;
@@ -45,8 +49,11 @@ public class Launcher {
 
 	private static ConsoleLogger logger;
 
+	// private static Archive archive;
+
 	public static void main(String[] args) {
 		logger = new ConsoleLogger(Logger.getLogger(Launcher.class.getName()));
+		RogmPatches.patch();
 
 		// TODO Auto-generated method stub
 
@@ -60,6 +67,12 @@ public class Launcher {
 				chainManager.addChainLayers(Launcher.class);
 				super.setupChainManager(chainManager);
 			}
+
+			// @Override
+			// protected void setupArchive(Archive archive) throws ScannerException {
+			// Launcher.archive = archive;
+			// super.setupArchive(archive);
+			// }
 		});
 
 		try (Session dbSession = pipe.buildSession()) {
@@ -67,6 +80,7 @@ public class Launcher {
 
 			// initHost(dbSession);
 			createFW(dbSession);
+			// logPatterns(ForwardBridgeHook.class);
 
 		} catch (Exception e) {
 			e.printStackTrace();

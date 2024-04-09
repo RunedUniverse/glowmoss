@@ -20,7 +20,6 @@ import lombok.Setter;
 import net.runeduniverse.lib.rogm.annotations.NodeEntity;
 import net.runeduniverse.lib.rogm.annotations.Relationship;
 import net.runeduniverse.tools.glowmoss.model.firewall.Hook;
-import net.runeduniverse.tools.glowmoss.model.firewall.ip.OutputHook;
 
 @NodeEntity(label = ForwardBridgeHook.LABEL)
 @Getter

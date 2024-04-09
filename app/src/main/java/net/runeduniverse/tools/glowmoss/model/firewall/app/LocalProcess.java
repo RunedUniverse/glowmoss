@@ -29,7 +29,7 @@ import net.runeduniverse.tools.glowmoss.model.firewall.ip.OutputHook;
 public class LocalProcess extends AProcess {
 
 	public LocalProcess() {
-		super(Layer.ARP);
+		super(Layer.APPLICATION);
 	}
 
 	@Relationship(label = "NEXT")
