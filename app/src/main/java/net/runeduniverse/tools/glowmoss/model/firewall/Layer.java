@@ -15,8 +15,8 @@
  */
 package net.runeduniverse.tools.glowmoss.model.firewall;
 
-public enum Family {
+public enum Layer {
 
-	NETDEV, INET, IP, IP6, BRIDGE, ARP;
+	NONE, APPLICATION, IP, BRIDGE, ARP;
 
 }

@@ -13,10 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.runeduniverse.tools.glowmoss.model.firewall;
+package net.runeduniverse.tools.glowmoss.model.firewall.bridge;
 
-public enum Family {
+import net.runeduniverse.lib.rogm.annotations.NodeEntity;
+import net.runeduniverse.tools.glowmoss.model.firewall.AHook;
+import net.runeduniverse.tools.glowmoss.model.firewall.Family;
+import net.runeduniverse.tools.glowmoss.model.firewall.Layer;
 
-	NETDEV, INET, IP, IP6, BRIDGE, ARP;
+@NodeEntity(label = "BRIDGE_LAYER")
+public class BridgeHook extends AHook {
+
+	protected BridgeHook() {
+		super(Layer.BRIDGE, Family.BRIDGE);
+	}
 
 }

@@ -31,7 +31,7 @@ import net.runeduniverse.lib.rogm.querying.QueryBuilder;
 import net.runeduniverse.lib.rogm.querying.QueryBuilder.NodeQueryBuilder;
 import net.runeduniverse.lib.rogm.querying.QueryBuilder.RelationQueryBuilder;
 import net.runeduniverse.lib.utils.chain.ChainManager;
-import net.runeduniverse.tools.glowmoss.model.firewall.Chain;
+import net.runeduniverse.tools.glowmoss.model.firewall.FirewallHandler;
 import net.runeduniverse.tools.glowmoss.model.network.Bridge;
 import net.runeduniverse.tools.glowmoss.model.network.Interface;
 import net.runeduniverse.tools.glowmoss.model.network.Namespace;
@@ -65,7 +65,8 @@ public class Launcher {
 		try (Session dbSession = pipe.buildSession()) {
 			qryBuilder = dbSession.getQueryBuilder();
 
-			initHost(dbSession);
+			// initHost(dbSession);
+			createFW(dbSession);
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -77,6 +78,13 @@ public class Launcher {
 		System.err.println(mapper.qry());
 		System.err.println();
 		System.err.println();
+	}
+
+	private static void createFW(Session session) {
+		FirewallHandler handler = FirewallHandler.create();
+
+		// session.saveAll(handler.nodes());
+		session.save(handler.getHookIngress(), 10);
 	}
 
 	private static void initHost(Session session) {
@@ -180,13 +188,17 @@ public class Launcher {
 	}
 
 	private static Configuration configureDB() {
-		Neo4jConfiguration dbCnf = new Neo4jConfiguration("10.88.0.2");
+		Neo4jConfiguration dbCnf = new Neo4jConfiguration("10.88.0.4");
 		// register model package
 		dbCnf.addPackage("net.runeduniverse.tools.glowmoss.model");
 		dbCnf.addPackage("net.runeduniverse.tools.glowmoss.model.firewall");
-		dbCnf.addPackage("net.runeduniverse.tools.glowmoss.model.network");
-		dbCnf.addPackage("net.runeduniverse.tools.glowmoss.model.server");
-		dbCnf.addPackage("net.runeduniverse.tools.glowmoss.model.server.rel");
+		dbCnf.addPackage("net.runeduniverse.tools.glowmoss.model.firewall.app");
+		dbCnf.addPackage("net.runeduniverse.tools.glowmoss.model.firewall.arp");
+		dbCnf.addPackage("net.runeduniverse.tools.glowmoss.model.firewall.bridge");
+		dbCnf.addPackage("net.runeduniverse.tools.glowmoss.model.firewall.ip");
+		// dbCnf.addPackage("net.runeduniverse.tools.glowmoss.model.network");
+		// dbCnf.addPackage("net.runeduniverse.tools.glowmoss.model.server");
+		// dbCnf.addPackage("net.runeduniverse.tools.glowmoss.model.server.rel");
 		// set classloader
 		dbCnf.addClassLoader(Launcher.class.getClassLoader());
 		// set credentials

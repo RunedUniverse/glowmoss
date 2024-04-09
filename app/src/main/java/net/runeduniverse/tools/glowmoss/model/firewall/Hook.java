@@ -15,108 +15,12 @@
  */
 package net.runeduniverse.tools.glowmoss.model.firewall;
 
-public enum Hook {
+import java.util.Set;
 
-	INGRESS {
-		@Override
-		boolean isAvailable(Family family, ChainType type) {
-			switch (family) {
-			case INET:
-			case NETDEV:
-				if (ChainType.FILTER.equals(type))
-					return true;
-			default:
-				return false;
-			}
-		}
-	},
-	PREROUTING {
-		@Override
-		boolean isAvailable(Family family, ChainType type) {
-			switch (family) {
-			case INET:
-			case IP6:
-			case IP:
-				if (ChainType.NAT.equals(type))
-					return true;
-			case BRIDGE:
-				return ChainType.FILTER.equals(type);
-			default:
-				return false;
-			}
-		}
-	},
-	FORWARD {
-		@Override
-		boolean isAvailable(Family family, ChainType type) {
-			switch (family) {
-			case INET:
-			case IP6:
-			case IP:
-			case BRIDGE:
-				return ChainType.FILTER.equals(type);
-			default:
-				return false;
-			}
-		}
-	},
-	INPUT {
-		@Override
-		boolean isAvailable(Family family, ChainType type) {
-			switch (family) {
-			case INET:
-			case IP6:
-			case IP:
-				if (ChainType.NAT.equals(type))
-					return true;
-			case ARP:
-			case BRIDGE:
-				return ChainType.FILTER.equals(type);
-			default:
-				return false;
-			}
-		}
-	},
-	OUTPUT {
-		@Override
-		boolean isAvailable(Family family, ChainType type) {
-			switch (family) {
-			case INET:
-			case IP6:
-			case IP:
-				if (ChainType.NAT.equals(type) || ChainType.ROUTE.equals(type))
-					return true;
-			case ARP:
-			case BRIDGE:
-				return ChainType.FILTER.equals(type);
-			default:
-				return false;
-			}
-		}
-	},
-	POSTROUTING {
-		@Override
-		boolean isAvailable(Family family, ChainType type) {
-			switch (family) {
-			case INET:
-			case IP6:
-			case IP:
-				if (ChainType.NAT.equals(type))
-					return true;
-			case BRIDGE:
-				return ChainType.FILTER.equals(type);
-			default:
-				return false;
-			}
-		}
-	},
-	EGRESS {
-		@Override
-		boolean isAvailable(Family family, ChainType type) {
-			return Family.NETDEV.equals(family) && ChainType.FILTER.equals(type);
-		}
-	};
+public interface Hook {
 
-	abstract boolean isAvailable(Family family, ChainType type);
+	Set<Family> getFamilies();
+
+	Layer getLayer();
 
 }

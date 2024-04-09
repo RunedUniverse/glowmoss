@@ -13,31 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.runeduniverse.tools.glowmoss.model.firewall;
+package net.runeduniverse.tools.glowmoss.model.firewall.bridge;
 
 import lombok.Getter;
 import lombok.Setter;
-import net.runeduniverse.lib.rogm.annotations.Direction;
 import net.runeduniverse.lib.rogm.annotations.NodeEntity;
 import net.runeduniverse.lib.rogm.annotations.Relationship;
-import net.runeduniverse.tools.glowmoss.model.AEntity;
+import net.runeduniverse.tools.glowmoss.model.firewall.EgressHook;
+import net.runeduniverse.tools.glowmoss.model.firewall.Hook;
+import net.runeduniverse.tools.glowmoss.model.firewall.ip.OutputHook;
 
-@NodeEntity(label = "FW_RULE")
+@NodeEntity(label = PostroutingBridgeHook.LABEL)
 @Getter
 @Setter
-public class Rule extends AEntity {
+public class PostroutingBridgeHook extends BridgeHook implements Hook {
 
-	private String content;
+	protected static final String LABEL = "POSTROUTING_BRIDGE";
 
-	private Policy policy;
-
-	@Relationship(label = "NEXT", direction = Direction.OUTGOING)
-	private Rule next;
-
-	@Relationship(label = "JUMP", direction = Direction.OUTGOING)
-	private Chain jumpTo;
-
-	@Relationship(label = "GOTO", direction = Direction.OUTGOING)
-	private Rule goTo;
+	@Relationship(label = "NEXT")
+	protected EgressHook next;
 
 }

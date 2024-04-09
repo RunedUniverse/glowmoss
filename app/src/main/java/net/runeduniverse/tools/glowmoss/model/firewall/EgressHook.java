@@ -15,8 +15,20 @@
  */
 package net.runeduniverse.tools.glowmoss.model.firewall;
 
-public enum Family {
+import lombok.Getter;
+import lombok.Setter;
+import net.runeduniverse.lib.rogm.annotations.NodeEntity;
+import net.runeduniverse.tools.glowmoss.model.firewall.ip.OutputHook;
 
-	NETDEV, INET, IP, IP6, BRIDGE, ARP;
+@NodeEntity(label = "EGRESS")
+@Getter
+@Setter
+public class EgressHook extends AHook {
+
+	// network device ?
+
+	public EgressHook() {
+		super(Layer.NONE, Family.NETDEV);
+	}
 
 }

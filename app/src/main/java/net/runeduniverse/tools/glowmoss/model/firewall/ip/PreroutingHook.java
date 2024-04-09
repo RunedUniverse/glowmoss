@@ -13,10 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.runeduniverse.tools.glowmoss.model.firewall;
+package net.runeduniverse.tools.glowmoss.model.firewall.ip;
 
-public enum Family {
+import lombok.Getter;
+import lombok.Setter;
+import net.runeduniverse.lib.rogm.annotations.NodeEntity;
+import net.runeduniverse.lib.rogm.annotations.Relationship;
+import net.runeduniverse.tools.glowmoss.model.firewall.Hook;
 
-	NETDEV, INET, IP, IP6, BRIDGE, ARP;
+@NodeEntity(label = PreroutingHook.LABEL)
+@Getter
+@Setter
+public class PreroutingHook extends IpHook implements Hook {
 
+	protected static final String LABEL = "PREROUTING";
+
+	@Relationship(label = "NEXT_IF_LOCAL")
+	public InputHook nextIfLocal;
+
+	@Relationship(label = "NEXT_IF_OTHER")
+	public ForwardHook nextIfOther;
 }

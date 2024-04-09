@@ -13,35 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.runeduniverse.tools.glowmoss.model.firewall;
-
-import java.util.LinkedHashSet;
-import java.util.Set;
+package net.runeduniverse.tools.glowmoss.model.firewall.ip;
 
 import lombok.Getter;
 import lombok.Setter;
-import net.runeduniverse.lib.rogm.annotations.Direction;
 import net.runeduniverse.lib.rogm.annotations.NodeEntity;
 import net.runeduniverse.lib.rogm.annotations.Relationship;
-import net.runeduniverse.tools.glowmoss.model.AEntity;
+import net.runeduniverse.tools.glowmoss.model.firewall.Hook;
 
-@NodeEntity(label = "FW_TABLE")
+@NodeEntity(label = OutputHook.LABEL)
 @Getter
-public class Table extends AEntity {
+@Setter
+public class OutputHook extends IpHook implements Hook {
 
-	@Setter
-	private String name;
-	@Setter
-	private Family family;
+	protected static final String LABEL = "OUTPUT";
 
-	@Relationship(direction = Direction.OUTGOING)
-	private Set<Chain> chains = new LinkedHashSet<>();
-
-	public boolean addChain(Chain chain) {
-		synchronized (this.chains) {
-			chain.setTable(this);
-			return this.chains.add(chain);
-		}
-	}
+	@Relationship(label = "NEXT")
+	protected PostroutingHook next;
 
 }

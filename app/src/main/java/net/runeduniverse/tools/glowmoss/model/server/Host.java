@@ -31,7 +31,6 @@ import net.runeduniverse.lib.rogm.annotations.PreSave;
 import net.runeduniverse.lib.rogm.annotations.Relationship;
 import net.runeduniverse.lib.rogm.annotations.Transient;
 import net.runeduniverse.tools.glowmoss.model.AEntity;
-import net.runeduniverse.tools.glowmoss.model.firewall.Chain;
 import net.runeduniverse.tools.glowmoss.model.network.Namespace;
 import net.runeduniverse.tools.glowmoss.model.server.rel.HasNetworkNamespace;
 

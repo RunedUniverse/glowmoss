@@ -15,8 +15,17 @@
  */
 package net.runeduniverse.tools.glowmoss.model.firewall;
 
-public enum Family {
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
-	NETDEV, INET, IP, IP6, BRIDGE, ARP;
+@Getter
+@NoArgsConstructor
+public class AProcess {
+
+	private Layer layer;
+
+	protected AProcess(Layer layer) {
+		this.layer = layer;
+	}
 
 }

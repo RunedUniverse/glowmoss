@@ -13,40 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.runeduniverse.tools.glowmoss.model.firewall;
+package net.runeduniverse.tools.glowmoss.model.firewall.arp;
 
-import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
-import net.runeduniverse.lib.rogm.annotations.Direction;
 import net.runeduniverse.lib.rogm.annotations.NodeEntity;
 import net.runeduniverse.lib.rogm.annotations.Relationship;
-import net.runeduniverse.tools.glowmoss.model.AEntity;
+import net.runeduniverse.tools.glowmoss.model.firewall.EgressHook;
+import net.runeduniverse.tools.glowmoss.model.firewall.Hook;
+import net.runeduniverse.tools.glowmoss.model.firewall.ip.OutputHook;
 
-@NodeEntity(label = "FW_CHAIN")
+@NodeEntity(label = OutputArpHook.LABEL)
 @Getter
-public class Chain extends AEntity {
+@Setter
+public class OutputArpHook extends ArpHook implements Hook {
 
-	@Setter
-	private String name;
-	@Setter
-	private ChainType type;
-	@Setter
-	private Hook hook;
-	@Setter
-	private String hookDevice;
-	@Setter
-	private Integer priority;
-	@Setter
-	private Policy defaultPolicy = Policy.ACCEPT;
-	@Setter
-	private String comment;
+	protected static final String LABEL = "OUTPUT_ARP";
 
-	@Relationship(direction = Direction.INCOMING)
-	@Setter(value = AccessLevel.PACKAGE)
-	private Table table;
-
-	@Relationship(direction = Direction.OUTGOING, label = "RULES")
-	private Rule nextRule;
+	@Relationship(label = "NEXT")
+	protected EgressHook egress;
 
 }
