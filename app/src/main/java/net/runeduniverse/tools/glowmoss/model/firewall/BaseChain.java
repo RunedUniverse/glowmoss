@@ -17,19 +17,17 @@ package net.runeduniverse.tools.glowmoss.model.firewall;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.experimental.Accessors;
 import net.runeduniverse.lib.rogm.annotations.Direction;
 import net.runeduniverse.lib.rogm.annotations.NodeEntity;
 import net.runeduniverse.lib.rogm.annotations.Relationship;
 
 @NodeEntity(label = "BASE_CHAIN")
 @Getter
+@Accessors(chain = true)
 public class BaseChain extends Chain {
 	
 	public static final String REL_LABEL_HOOK = "CALLS";
-
-	// default = 'filter'
-	@Setter
-	private ChainType type = ChainType.FILTER;
 
 	@Setter
 	@Relationship(label = REL_LABEL_HOOK, direction = Direction.INCOMING)
@@ -82,7 +80,7 @@ public class BaseChain extends Chain {
     // └───────┴───────┴─────────────┘
 	
 	@Setter
-	private String priority = "filter";
+	private String priority = "";
 	@Setter
 	private Integer effPriority = 0;
 

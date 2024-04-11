@@ -20,6 +20,7 @@ import java.util.List;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.experimental.Accessors;
 import net.runeduniverse.lib.rogm.annotations.Direction;
 import net.runeduniverse.lib.rogm.annotations.NodeEntity;
 import net.runeduniverse.lib.rogm.annotations.PostLoad;
@@ -32,6 +33,7 @@ import net.runeduniverse.lib.rogm.annotations.Relationship;
  * for better rule organization.
  */
 @NodeEntity(label = "CHAIN")
+@Accessors(chain = true)
 public class Chain {
 
 	public static final String LABEL_REL_TABLE = "HAS_CHAIN";
@@ -43,6 +45,15 @@ public class Chain {
 
 	@Getter
 	@Setter
+	private String name;
+
+	// default = 'filter'
+	@Getter
+	@Setter
+	private ChainType type = ChainType.FILTER;
+
+	@Getter
+	@Setter
 	private String policy = null;
 
 	@Relationship(label = "NEXT")
@@ -50,6 +61,16 @@ public class Chain {
 
 	@Getter
 	private List<Rule> rules = new LinkedList<>();
+
+	public Chain addRule(Rule rule) {
+		this.rules.add(rule);
+		return this;
+	}
+
+	public Chain removeRule(Rule rule) {
+		this.rules.remove(rule);
+		return this;
+	}
 
 	@PostLoad
 	private void postLoad() {

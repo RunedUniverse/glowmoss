@@ -16,11 +16,10 @@
 package net.runeduniverse.tools.glowmoss.model.firewall;
 
 import java.util.Collection;
-import java.util.LinkedHashSet;
-import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 import lombok.Getter;
+import net.runeduniverse.lib.rogm.Session;
 import net.runeduniverse.tools.glowmoss.model.firewall.app.LocalProcess;
 import net.runeduniverse.tools.glowmoss.model.firewall.arp.ArpHandler;
 import net.runeduniverse.tools.glowmoss.model.firewall.arp.InputArpHook;
@@ -187,27 +186,8 @@ public class FirewallHandler {
 		return handler;
 	}
 
-	public Collection<Object> nodes() {
-		final Set<Object> nodes = new LinkedHashSet<>();
-
-		nodes.add(localProcess);
-		nodes.add(ipHookPrerouting);
-		nodes.add(ipHookInput);
-		nodes.add(ipHookForward);
-		nodes.add(ipHookOutput);
-		nodes.add(ipHookPostrouting);
-		nodes.add(bridgeHookPrerouting);
-		nodes.add(bridgeHookInput);
-		nodes.add(bridgeHookForward);
-		nodes.add(bridgeHookOutput);
-		nodes.add(bridgeHookPostrouting);
-		nodes.add(arpHookInput);
-		nodes.add(arpHandler);
-		nodes.add(arpHookOutput);
-		nodes.add(hookIngress);
-		nodes.add(hookEgress);
-
-		return nodes;
+	public void save(Session session) {
+		session.save(this.hookIngress, 20);
 	}
 
 }

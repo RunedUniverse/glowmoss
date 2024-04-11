@@ -55,4 +55,34 @@ public class Table {
 
 	private List<String> statefulObjects = new LinkedList<>();
 
+	public BaseChain createBaseChain(final String name, final ChainType type, final Hook hook, final Integer priority) {
+		final BaseChain chain = new BaseChain();
+		chain.setType(type);
+		chain.setHook(hook);
+		chain.setEffPriority(priority);
+		addChain(chain);
+		return chain;
+	}
+
+	public Chain createChain(final String name, final ChainType type) {
+		final Chain chain = new Chain();
+		chain.setName(name);
+		addChain(chain);
+		return chain;
+	}
+
+	public void addChain(final Chain chain) {
+		synchronized (this.chains) {
+			chain.setTable(this);
+			this.chains.add(chain);
+		}
+	}
+
+	public void removeChain(final Chain chain) {
+		synchronized (this.chains) {
+			chain.setTable(null);
+			this.chains.remove(chain);
+		}
+	}
+
 }
