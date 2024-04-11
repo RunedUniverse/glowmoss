@@ -15,14 +15,23 @@
  */
 package net.runeduniverse.tools.glowmoss;
 
+import java.util.Comparator;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 
 import net.runeduniverse.lib.rogm.pattern.Archive;
+import net.runeduniverse.lib.rogm.pattern.IBaseQueryPattern;
 import net.runeduniverse.lib.rogm.pattern.IPattern;
+import net.runeduniverse.lib.rogm.pattern.IPattern.IData;
+import net.runeduniverse.lib.rogm.pipeline.chain.Chains;
 import net.runeduniverse.lib.rogm.querying.QueryBuilder;
 import net.runeduniverse.lib.rogm.querying.QueryBuilder.NodeQueryBuilder;
 import net.runeduniverse.lib.rogm.querying.QueryBuilder.RelationQueryBuilder;
+import net.runeduniverse.lib.utils.chain.Chain;
+import net.runeduniverse.lib.utils.chain.ChainRuntime;
 
 public class RogmPatches {
 
@@ -30,6 +39,8 @@ public class RogmPatches {
 		QueryBuilder.CREATOR_NODE_BUILDER = RogmPatches::createNodeBuilder;
 		QueryBuilder.CREATOR_REALATION_BUILDER = RogmPatches::createRelationBuilder;
 	}
+
+	// helpers
 
 	private static Set<String> collectLabels(final Archive archive, final Class<?> type) {
 		final Set<String> labels = new LinkedHashSet<>();
@@ -42,6 +53,8 @@ public class RogmPatches {
 		}
 		return labels;
 	}
+
+	// CREATER
 
 	private static NodeQueryBuilder createNodeBuilder(Archive archive) {
 		return new NodeQueryBuilder(archive) {
@@ -62,6 +75,40 @@ public class RogmPatches {
 			}
 		};
 	}
+
+	// CHAINS
+
+	@Chain(label = Chains.BUFFER_CHAIN.LOAD.LABEL, layers = { Chains.BUFFER_CHAIN.LOAD.PREPARE_DATA - 10 })
+	public static IBaseQueryPattern<?> locateBestMatchByLabelsPattern(final ChainRuntime<?> runtime,
+			final Archive archive, final IBaseQueryPattern<?> pattern, IData data) {
+
+		final Set<String> labels = data.getLabels();
+		final LinkedList<IPattern> patterns = new LinkedList<>(
+				archive.getPatternsByLabels(labels, pattern.getType(), IBaseQueryPattern.class));
+
+		patterns.remove(null);
+		if (patterns.isEmpty())
+			return pattern;
+
+		patterns.sort(new Comparator<IPattern>() {
+			@Override
+			public int compare(IPattern p1, IPattern p2) {
+				final Class<?> t1 = p1.getType(), t2 = p2.getType();
+				if (t1.equals(t2))
+					return 0;
+				if (t1.isAssignableFrom(t2))
+					return 1;
+				if (t2.isAssignableFrom(t1))
+					return -1;
+				// they are not comparable ... so fallback
+				return Integer.compareUnsigned(p1.hashCode(), p2.hashCode());
+			}
+		});
+
+		return (IBaseQueryPattern<?>) patterns.getLast();
+	}
+
+	// optional
 
 	private static void logPatterns(Archive archive, Class<?> type) {
 		System.err.println("Patterns of " + type.getSimpleName());
