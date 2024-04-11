@@ -15,29 +15,6 @@
  */
 package net.runeduniverse.tools.glowmoss.model.firewall;
 
-import java.util.LinkedHashSet;
-import java.util.Set;
-
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import net.runeduniverse.lib.rogm.annotations.NodeEntity;
-
-@Getter
-@NoArgsConstructor
-@NodeEntity(label = "HOOK")
-public class AHook implements Hook {
-
-	private final Set<Family> families = new LinkedHashSet<>();
-
-	private Layer layer = Layer.NONE;
-
-	protected AHook(Layer layer, Family... families) {
-		this.layer = layer;
-		if (families == null)
-			return;
-		for (Family family : families) {
-			this.families.add(family);
-		}
-	}
+public class RegularChain extends Chain {
 
 }

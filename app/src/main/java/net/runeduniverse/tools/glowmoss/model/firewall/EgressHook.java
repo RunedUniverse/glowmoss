@@ -23,7 +23,7 @@ import net.runeduniverse.tools.glowmoss.model.firewall.ip.OutputHook;
 @NodeEntity(label = "EGRESS")
 @Getter
 @Setter
-public class EgressHook extends AHook {
+public class EgressHook extends Hook {
 
 	// network device ?
 

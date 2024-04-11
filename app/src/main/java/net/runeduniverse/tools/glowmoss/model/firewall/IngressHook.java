@@ -26,7 +26,7 @@ import net.runeduniverse.tools.glowmoss.model.firewall.ip.PreroutingHook;
 @NodeEntity(label = "INGRESS")
 @Getter
 @Setter
-public class IngressHook extends AHook {
+public class IngressHook extends Hook {
 
 	// network device ?
 

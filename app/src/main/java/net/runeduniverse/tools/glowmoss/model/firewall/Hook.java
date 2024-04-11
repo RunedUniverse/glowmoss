@@ -15,12 +15,34 @@
  */
 package net.runeduniverse.tools.glowmoss.model.firewall;
 
+import java.util.LinkedHashSet;
 import java.util.Set;
 
-public interface Hook {
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import net.runeduniverse.lib.rogm.annotations.Direction;
+import net.runeduniverse.lib.rogm.annotations.NodeEntity;
+import net.runeduniverse.lib.rogm.annotations.Relationship;
 
-	Set<Family> getFamilies();
+@Getter
+@NoArgsConstructor
+@NodeEntity(label = "HOOK")
+public class Hook {
 
-	Layer getLayer();
+	private final Set<Family> families = new LinkedHashSet<>();
+
+	private Layer layer = Layer.NONE;
+
+	@Relationship(label = BaseChain.REL_LABEL_HOOK, direction = Direction.OUTGOING)
+	private Set<BaseChain> chains = new LinkedHashSet<>();
+
+	protected Hook(Layer layer, Family... families) {
+		this.layer = layer;
+		if (families == null)
+			return;
+		for (Family family : families) {
+			this.families.add(family);
+		}
+	}
 
 }

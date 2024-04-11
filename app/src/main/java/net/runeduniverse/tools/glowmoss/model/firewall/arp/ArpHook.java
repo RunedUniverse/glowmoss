@@ -16,12 +16,12 @@
 package net.runeduniverse.tools.glowmoss.model.firewall.arp;
 
 import net.runeduniverse.lib.rogm.annotations.NodeEntity;
-import net.runeduniverse.tools.glowmoss.model.firewall.AHook;
+import net.runeduniverse.tools.glowmoss.model.firewall.Hook;
 import net.runeduniverse.tools.glowmoss.model.firewall.Family;
 import net.runeduniverse.tools.glowmoss.model.firewall.Layer;
 
 @NodeEntity(label = "ARP_LAYER")
-public class ArpHook extends AHook {
+public class ArpHook extends Hook {
 
 	protected ArpHook() {
 		super(Layer.ARP, Family.ARP);

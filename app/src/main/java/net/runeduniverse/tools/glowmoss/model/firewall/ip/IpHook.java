@@ -16,12 +16,12 @@
 package net.runeduniverse.tools.glowmoss.model.firewall.ip;
 
 import net.runeduniverse.lib.rogm.annotations.NodeEntity;
-import net.runeduniverse.tools.glowmoss.model.firewall.AHook;
+import net.runeduniverse.tools.glowmoss.model.firewall.Hook;
 import net.runeduniverse.tools.glowmoss.model.firewall.Family;
 import net.runeduniverse.tools.glowmoss.model.firewall.Layer;
 
 @NodeEntity(label = "IP_LAYER")
-public class IpHook extends AHook {
+public class IpHook extends Hook {
 
 	protected IpHook() {
 		super(Layer.IP, Family.INET, Family.IP, Family.IP6);

@@ -16,12 +16,12 @@
 package net.runeduniverse.tools.glowmoss.model.firewall.bridge;
 
 import net.runeduniverse.lib.rogm.annotations.NodeEntity;
-import net.runeduniverse.tools.glowmoss.model.firewall.AHook;
+import net.runeduniverse.tools.glowmoss.model.firewall.Hook;
 import net.runeduniverse.tools.glowmoss.model.firewall.Family;
 import net.runeduniverse.tools.glowmoss.model.firewall.Layer;
 
 @NodeEntity(label = "BRIDGE_LAYER")
-public class BridgeHook extends AHook {
+public class BridgeHook extends Hook {
 
 	protected BridgeHook() {
 		super(Layer.BRIDGE, Family.BRIDGE);
