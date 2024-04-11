@@ -17,17 +17,13 @@ package net.runeduniverse.tools.glowmoss;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Logger;
 
 import net.runeduniverse.lib.rogm.Configuration;
 import net.runeduniverse.lib.rogm.Session;
-import net.runeduniverse.lib.rogm.errors.ScannerException;
 import net.runeduniverse.lib.rogm.lang.Language.IMapper;
 import net.runeduniverse.lib.rogm.modules.neo4j.Neo4jConfiguration;
-import net.runeduniverse.lib.rogm.pattern.Archive;
-import net.runeduniverse.lib.rogm.pattern.IPattern;
 import net.runeduniverse.lib.rogm.pipeline.DatabasePipelineFactory;
 import net.runeduniverse.lib.rogm.pipeline.Pipeline;
 import net.runeduniverse.lib.rogm.pipeline.chain.Chains;
