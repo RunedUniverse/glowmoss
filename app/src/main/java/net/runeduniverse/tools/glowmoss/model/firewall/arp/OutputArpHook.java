@@ -20,8 +20,6 @@ import lombok.Setter;
 import net.runeduniverse.lib.rogm.annotations.NodeEntity;
 import net.runeduniverse.lib.rogm.annotations.Relationship;
 import net.runeduniverse.tools.glowmoss.model.firewall.EgressHook;
-import net.runeduniverse.tools.glowmoss.model.firewall.Hook;
-import net.runeduniverse.tools.glowmoss.model.firewall.ip.OutputHook;
 
 @NodeEntity(label = OutputArpHook.LABEL)
 @Getter
@@ -29,6 +27,8 @@ import net.runeduniverse.tools.glowmoss.model.firewall.ip.OutputHook;
 public class OutputArpHook extends ArpHook {
 
 	protected static final String LABEL = "OUTPUT_ARP";
+
+	private String name = LABEL;
 
 	@Relationship(label = "NEXT")
 	protected EgressHook egress;

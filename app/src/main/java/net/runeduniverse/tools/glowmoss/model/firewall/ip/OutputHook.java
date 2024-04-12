@@ -27,6 +27,8 @@ public class OutputHook extends IpHook {
 
 	protected static final String LABEL = "OUTPUT";
 
+	private String name = LABEL;
+
 	@Relationship(label = "NEXT")
 	protected PostroutingHook next;
 

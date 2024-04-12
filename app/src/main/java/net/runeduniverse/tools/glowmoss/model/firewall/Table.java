@@ -21,6 +21,7 @@ import lombok.Getter;
 import lombok.Setter;
 import net.runeduniverse.lib.rogm.annotations.NodeEntity;
 import net.runeduniverse.lib.rogm.annotations.Relationship;
+import net.runeduniverse.tools.glowmoss.model.AEntity;
 
 /*
  * Tables are containers for chains, sets and stateful objects. They are identified by their address family and
@@ -32,7 +33,7 @@ import net.runeduniverse.lib.rogm.annotations.Relationship;
  */
 @Getter
 @NodeEntity(label = "TABLE")
-public class Table {
+public class Table extends AEntity {
 
 	// IP is default
 	@Setter

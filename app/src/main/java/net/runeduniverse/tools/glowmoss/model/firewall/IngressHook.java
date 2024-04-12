@@ -23,10 +23,14 @@ import net.runeduniverse.tools.glowmoss.model.firewall.arp.InputArpHook;
 import net.runeduniverse.tools.glowmoss.model.firewall.bridge.PreroutingBridgeHook;
 import net.runeduniverse.tools.glowmoss.model.firewall.ip.PreroutingHook;
 
-@NodeEntity(label = "INGRESS")
+@NodeEntity(label = IngressHook.LABEL)
 @Getter
 @Setter
 public class IngressHook extends Hook {
+
+	protected static final String LABEL = "INGRESS";
+
+	private String name = LABEL;
 
 	// network device ?
 

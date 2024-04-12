@@ -19,8 +19,6 @@ import lombok.Getter;
 import lombok.Setter;
 import net.runeduniverse.lib.rogm.annotations.NodeEntity;
 import net.runeduniverse.lib.rogm.annotations.Relationship;
-import net.runeduniverse.tools.glowmoss.model.firewall.Hook;
-import net.runeduniverse.tools.glowmoss.model.firewall.ip.OutputHook;
 import net.runeduniverse.tools.glowmoss.model.firewall.ip.PreroutingHook;
 
 @NodeEntity(label = InputBridgeHook.LABEL)
@@ -29,6 +27,8 @@ import net.runeduniverse.tools.glowmoss.model.firewall.ip.PreroutingHook;
 public class InputBridgeHook extends BridgeHook {
 
 	protected static final String LABEL = "INPUT_BRIDGE";
+
+	private String name = LABEL;
 
 	@Relationship(label = "NEXT")
 	protected PreroutingHook next;

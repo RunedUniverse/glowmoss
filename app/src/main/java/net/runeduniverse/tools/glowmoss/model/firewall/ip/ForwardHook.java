@@ -27,6 +27,8 @@ public class ForwardHook extends IpHook {
 
 	protected static final String LABEL = "FORWARD";
 
+	private String name = LABEL;
+
 	@Relationship(label = "NEXT")
 	public PostroutingHook next;
 

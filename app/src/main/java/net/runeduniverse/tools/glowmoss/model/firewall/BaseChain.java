@@ -21,6 +21,7 @@ import lombok.experimental.Accessors;
 import net.runeduniverse.lib.rogm.annotations.Direction;
 import net.runeduniverse.lib.rogm.annotations.NodeEntity;
 import net.runeduniverse.lib.rogm.annotations.Relationship;
+import net.runeduniverse.lib.rogm.annotations.Transient;
 
 @NodeEntity(label = "BASE_CHAIN")
 @Getter
@@ -30,6 +31,7 @@ public class BaseChain extends Chain {
 	public static final String REL_LABEL_HOOK = "CALLS";
 
 	@Setter
+	@Transient
 	@Relationship(label = REL_LABEL_HOOK, direction = Direction.INCOMING)
 	private Hook hook;
 

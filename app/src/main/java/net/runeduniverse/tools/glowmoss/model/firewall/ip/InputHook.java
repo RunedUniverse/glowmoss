@@ -28,6 +28,8 @@ public class InputHook extends IpHook {
 
 	protected static final String LABEL = "INPUT";
 
+	private String name = LABEL;
+
 	@Relationship(label = "NEXT")
 	protected LocalProcess next;
 

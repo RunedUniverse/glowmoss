@@ -19,10 +19,14 @@ import lombok.Getter;
 import lombok.Setter;
 import net.runeduniverse.lib.rogm.annotations.NodeEntity;
 
-@NodeEntity(label = "EGRESS")
+@NodeEntity(label = EgressHook.LABEL)
 @Getter
 @Setter
 public class EgressHook extends Hook {
+
+	protected static final String LABEL = "EGRESS";
+
+	private String name = LABEL;
 
 	// network device ?
 

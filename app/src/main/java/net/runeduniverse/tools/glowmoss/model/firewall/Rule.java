@@ -21,11 +21,12 @@ import lombok.experimental.Accessors;
 import net.runeduniverse.lib.rogm.annotations.Direction;
 import net.runeduniverse.lib.rogm.annotations.NodeEntity;
 import net.runeduniverse.lib.rogm.annotations.Relationship;
+import net.runeduniverse.tools.glowmoss.model.AEntity;
 
 @Getter
 @NodeEntity(label = "RULE")
 @Accessors(chain = true)
-public class Rule {
+public class Rule extends AEntity {
 
 	private static final String REL_LABEL_JUMP = "JUMP";
 	private static final String REL_LABEL_GOTO = "GOTO";

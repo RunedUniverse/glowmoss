@@ -27,6 +27,8 @@ public class PreroutingHook extends IpHook {
 
 	protected static final String LABEL = "PREROUTING";
 
+	private String name = LABEL;
+
 	@Relationship(label = "NEXT_IF_LOCAL")
 	public InputHook nextIfLocal;
 

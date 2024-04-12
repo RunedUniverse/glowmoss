@@ -19,7 +19,6 @@ import lombok.Getter;
 import lombok.Setter;
 import net.runeduniverse.lib.rogm.annotations.NodeEntity;
 import net.runeduniverse.lib.rogm.annotations.Relationship;
-import net.runeduniverse.tools.glowmoss.model.firewall.Hook;
 
 @NodeEntity(label = ForwardBridgeHook.LABEL)
 @Getter
@@ -27,6 +26,8 @@ import net.runeduniverse.tools.glowmoss.model.firewall.Hook;
 public class ForwardBridgeHook extends BridgeHook {
 
 	protected static final String LABEL = "FORWARD_BRIDGE";
+
+	private String name = LABEL;
 
 	@Relationship(label = "NEXT")
 	protected PostroutingBridgeHook next;

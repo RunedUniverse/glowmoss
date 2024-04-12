@@ -29,6 +29,8 @@ public class PostroutingHook extends IpHook {
 
 	protected static final String LABEL = "POSTROUTING";
 
+	private String name = LABEL;
+
 	@Relationship(label = "NEXT_IF_BRIDGE_DEVICE")
 	protected OutputBridgeHook nextIfBridgeDevice;
 

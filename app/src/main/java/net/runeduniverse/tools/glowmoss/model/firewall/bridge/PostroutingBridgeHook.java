@@ -28,6 +28,8 @@ public class PostroutingBridgeHook extends BridgeHook {
 
 	protected static final String LABEL = "POSTROUTING_BRIDGE";
 
+	private String name = LABEL;
+
 	@Relationship(label = "NEXT")
 	protected EgressHook next;
 

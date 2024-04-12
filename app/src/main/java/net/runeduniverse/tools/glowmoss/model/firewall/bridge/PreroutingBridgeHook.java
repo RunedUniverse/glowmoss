@@ -27,6 +27,8 @@ public class PreroutingBridgeHook extends BridgeHook {
 
 	protected static final String LABEL = "PREROUTING_BRIDGE";
 
+	private String name = LABEL;
+
 	@Relationship(label = "NEXT_IF_IP")
 	protected InputBridgeHook nextIfIp;
 

@@ -22,10 +22,14 @@ import net.runeduniverse.lib.rogm.annotations.Relationship;
 import net.runeduniverse.tools.glowmoss.model.firewall.AProcess;
 import net.runeduniverse.tools.glowmoss.model.firewall.Layer;
 
-@NodeEntity(label = "ARP_HANDLER")
+@NodeEntity(label = ArpHandler.LABEL)
 @Getter
 @Setter
 public class ArpHandler extends AProcess {
+
+	protected static final String LABEL = "ARP_HANDLER";
+
+	private String name = LABEL;
 
 	public ArpHandler() {
 		super(Layer.ARP);

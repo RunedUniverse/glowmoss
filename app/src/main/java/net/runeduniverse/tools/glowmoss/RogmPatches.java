@@ -16,10 +16,8 @@
 package net.runeduniverse.tools.glowmoss;
 
 import java.util.Comparator;
-import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Set;
 
 import net.runeduniverse.lib.rogm.pattern.Archive;
@@ -31,6 +29,7 @@ import net.runeduniverse.lib.rogm.querying.QueryBuilder;
 import net.runeduniverse.lib.rogm.querying.QueryBuilder.NodeQueryBuilder;
 import net.runeduniverse.lib.rogm.querying.QueryBuilder.RelationQueryBuilder;
 import net.runeduniverse.lib.utils.chain.Chain;
+import net.runeduniverse.lib.utils.chain.ChainManager;
 import net.runeduniverse.lib.utils.chain.ChainRuntime;
 
 public class RogmPatches {
@@ -38,6 +37,10 @@ public class RogmPatches {
 	public static void patch() {
 		QueryBuilder.CREATOR_NODE_BUILDER = RogmPatches::createNodeBuilder;
 		QueryBuilder.CREATOR_REALATION_BUILDER = RogmPatches::createRelationBuilder;
+	}
+
+	public static void patch(ChainManager chainManager) {
+		chainManager.addChainLayers(RogmPatches.class);
 	}
 
 	// helpers

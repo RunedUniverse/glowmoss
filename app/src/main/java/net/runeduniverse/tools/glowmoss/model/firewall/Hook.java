@@ -23,11 +23,12 @@ import lombok.NoArgsConstructor;
 import net.runeduniverse.lib.rogm.annotations.Direction;
 import net.runeduniverse.lib.rogm.annotations.NodeEntity;
 import net.runeduniverse.lib.rogm.annotations.Relationship;
+import net.runeduniverse.tools.glowmoss.model.AEntity;
 
 @Getter
 @NoArgsConstructor
 @NodeEntity(label = "HOOK")
-public class Hook {
+public class Hook extends AEntity {
 
 	private final Set<Family> families = new LinkedHashSet<>();
 

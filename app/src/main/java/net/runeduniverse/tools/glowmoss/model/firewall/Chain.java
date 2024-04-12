@@ -26,6 +26,8 @@ import net.runeduniverse.lib.rogm.annotations.NodeEntity;
 import net.runeduniverse.lib.rogm.annotations.PostLoad;
 import net.runeduniverse.lib.rogm.annotations.PreSave;
 import net.runeduniverse.lib.rogm.annotations.Relationship;
+import net.runeduniverse.lib.rogm.annotations.Transient;
+import net.runeduniverse.tools.glowmoss.model.AEntity;
 
 /*
  * Chains are containers for rules. They exist in two kinds, base chains and regular chains. A base chain is an
@@ -34,7 +36,7 @@ import net.runeduniverse.lib.rogm.annotations.Relationship;
  */
 @NodeEntity(label = "CHAIN")
 @Accessors(chain = true)
-public class Chain {
+public class Chain extends AEntity {
 
 	public static final String LABEL_REL_TABLE = "HAS_CHAIN";
 
@@ -60,6 +62,7 @@ public class Chain {
 	private Rule firstRule;
 
 	@Getter
+	@Transient
 	private List<Rule> rules = new LinkedList<>();
 
 	public Chain addRule(Rule rule) {

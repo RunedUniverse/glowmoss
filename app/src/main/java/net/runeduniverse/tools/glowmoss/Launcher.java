@@ -59,13 +59,13 @@ public class Launcher {
 
 		dbCnf = configureDB();
 
-		dbCnf.setLogger(logger);
+		// dbCnf.setLogger(logger);
 
 		Pipeline pipe = new Pipeline(new DatabasePipelineFactory(dbCnf) {
 			@Override
 			protected void setupChainManager(ChainManager chainManager) throws Exception {
 				chainManager.addChainLayers(Launcher.class);
-				chainManager.addChainLayers(RogmPatches.class);
+				RogmPatches.patch(chainManager);
 				super.setupChainManager(chainManager);
 			}
 
@@ -103,10 +103,11 @@ public class Launcher {
 		table.setName("basic-filter");
 
 		table.createBaseChain("input-filter", ChainType.FILTER, handler.getIpHookInput(), 0)
-				.addRule(new Rule().setContent(" ct state established,related accept"))
+				.addRule(new Rule().setContent("ct state established,related accept"))
 				.addRule(new Rule().setContent("ip saddr 10.1.1.1 tcp dport ssh accept"));
 
 		handler.save(session);
+		session.save(table, 20);
 	}
 
 	private static void initHost(Session session) {
@@ -210,7 +211,7 @@ public class Launcher {
 	}
 
 	private static Configuration configureDB() {
-		Neo4jConfiguration dbCnf = new Neo4jConfiguration("10.88.0.4");
+		Neo4jConfiguration dbCnf = new Neo4jConfiguration("10.88.0.2");
 		// register model package
 		dbCnf.addPackage("net.runeduniverse.tools.glowmoss.model");
 		dbCnf.addPackage("net.runeduniverse.tools.glowmoss.model.firewall");

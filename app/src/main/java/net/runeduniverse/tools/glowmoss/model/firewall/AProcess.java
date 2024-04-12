@@ -17,10 +17,11 @@ package net.runeduniverse.tools.glowmoss.model.firewall;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import net.runeduniverse.tools.glowmoss.model.AEntity;
 
 @Getter
 @NoArgsConstructor
-public class AProcess {
+public class AProcess extends AEntity {
 
 	private Layer layer;
 

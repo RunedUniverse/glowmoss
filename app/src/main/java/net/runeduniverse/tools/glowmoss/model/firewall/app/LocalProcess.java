@@ -23,10 +23,14 @@ import net.runeduniverse.tools.glowmoss.model.firewall.AProcess;
 import net.runeduniverse.tools.glowmoss.model.firewall.Layer;
 import net.runeduniverse.tools.glowmoss.model.firewall.ip.OutputHook;
 
-@NodeEntity(label = "LOCAL_PROCESS")
+@NodeEntity(label = LocalProcess.LABEL)
 @Getter
 @Setter
 public class LocalProcess extends AProcess {
+
+	protected static final String LABEL = "LOCAL_PROCESS";
+
+	private String name = LABEL;
 
 	public LocalProcess() {
 		super(Layer.APPLICATION);
