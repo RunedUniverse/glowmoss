@@ -24,7 +24,7 @@ import net.runeduniverse.tools.glowmoss.model.firewall.Hook;
 @NodeEntity(label = ForwardBridgeHook.LABEL)
 @Getter
 @Setter
-public class ForwardBridgeHook extends BridgeHook implements Hook {
+public class ForwardBridgeHook extends BridgeHook {
 
 	protected static final String LABEL = "FORWARD_BRIDGE";
 

@@ -25,7 +25,7 @@ import net.runeduniverse.tools.glowmoss.model.firewall.ip.OutputHook;
 @NodeEntity(label = OutputBridgeHook.LABEL)
 @Getter
 @Setter
-public class OutputBridgeHook extends BridgeHook implements Hook {
+public class OutputBridgeHook extends BridgeHook {
 
 	protected static final String LABEL = "OUTPUT_BRIDGE";
 

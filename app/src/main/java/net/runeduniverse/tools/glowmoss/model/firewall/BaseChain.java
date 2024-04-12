@@ -26,7 +26,7 @@ import net.runeduniverse.lib.rogm.annotations.Relationship;
 @Getter
 @Accessors(chain = true)
 public class BaseChain extends Chain {
-	
+
 	public static final String REL_LABEL_HOOK = "CALLS";
 
 	@Setter
@@ -38,47 +38,47 @@ public class BaseChain extends Chain {
 	private String device = null;
 
 	// Table 6. Standard priority names, family and hook compatibility matrix
-    // ┌─────────┬───────┬─────────────────────┬─────────────┐
-    // │Name     │ Value │ Families            │ Hooks       │
-    // ├─────────┼───────┼─────────────────────┼─────────────┤
-    // │         │       │                     │             │
-    // │raw      │ -300  │ ip, ip6, inet       │ all         │
-    // ├─────────┼───────┼─────────────────────┼─────────────┤
-    // │         │       │                     │             │
-    // │mangle   │ -150  │ ip, ip6, inet       │ all         │
-    // ├─────────┼───────┼─────────────────────┼─────────────┤
-    // │         │       │                     │             │
-    // │dstnat   │ -100  │ ip, ip6, inet       │ prerouting  │
-    // ├─────────┼───────┼─────────────────────┼─────────────┤
-    // │         │       │                     │             │
-    // │filter   │ 0     │ ip, ip6, inet, arp, │ all         │
-    // │         │       │ netdev              │             │
-    // ├─────────┼───────┼─────────────────────┼─────────────┤
-    // │         │       │                     │             │
-    // │security │ 50    │ ip, ip6, inet       │ all         │
-    // ├─────────┼───────┼─────────────────────┼─────────────┤
-    // │         │       │                     │             │
-    // │srcnat   │ 100   │ ip, ip6, inet       │ postrouting │
-    // └─────────┴───────┴─────────────────────┴─────────────┘
-    // 
-    // Table 7. Standard priority names and hook compatibility for the bridge family
-    // ┌───────┬───────┬─────────────┐
-    // │       │       │             │
-    // │Name   │ Value │ Hooks       │
-    // ├───────┼───────┼─────────────┤
-    // │       │       │             │
-    // │dstnat │ -300  │ prerouting  │
-    // ├───────┼───────┼─────────────┤
-    // │       │       │             │
-    // │filter │ -200  │ all         │
-    // ├───────┼───────┼─────────────┤
-    // │       │       │             │
-    // │out    │ 100   │ output      │
-    // ├───────┼───────┼─────────────┤
-    // │       │       │             │
-    // │srcnat │ 300   │ postrouting │
-    // └───────┴───────┴─────────────┘
-	
+	// ┌─────────┬───────┬─────────────────────┬─────────────┐
+	// │Name │ Value │ Families │ Hooks │
+	// ├─────────┼───────┼─────────────────────┼─────────────┤
+	// │ │ │ │ │
+	// │raw │ -300 │ ip, ip6, inet │ all │
+	// ├─────────┼───────┼─────────────────────┼─────────────┤
+	// │ │ │ │ │
+	// │mangle │ -150 │ ip, ip6, inet │ all │
+	// ├─────────┼───────┼─────────────────────┼─────────────┤
+	// │ │ │ │ │
+	// │dstnat │ -100 │ ip, ip6, inet │ prerouting │
+	// ├─────────┼───────┼─────────────────────┼─────────────┤
+	// │ │ │ │ │
+	// │filter │ 0 │ ip, ip6, inet, arp, │ all │
+	// │ │ │ netdev │ │
+	// ├─────────┼───────┼─────────────────────┼─────────────┤
+	// │ │ │ │ │
+	// │security │ 50 │ ip, ip6, inet │ all │
+	// ├─────────┼───────┼─────────────────────┼─────────────┤
+	// │ │ │ │ │
+	// │srcnat │ 100 │ ip, ip6, inet │ postrouting │
+	// └─────────┴───────┴─────────────────────┴─────────────┘
+	//
+	// Table 7. Standard priority names and hook compatibility for the bridge family
+	// ┌───────┬───────┬─────────────┐
+	// │ │ │ │
+	// │Name │ Value │ Hooks │
+	// ├───────┼───────┼─────────────┤
+	// │ │ │ │
+	// │dstnat │ -300 │ prerouting │
+	// ├───────┼───────┼─────────────┤
+	// │ │ │ │
+	// │filter │ -200 │ all │
+	// ├───────┼───────┼─────────────┤
+	// │ │ │ │
+	// │out │ 100 │ output │
+	// ├───────┼───────┼─────────────┤
+	// │ │ │ │
+	// │srcnat │ 300 │ postrouting │
+	// └───────┴───────┴─────────────┘
+
 	@Setter
 	private String priority = "";
 	@Setter

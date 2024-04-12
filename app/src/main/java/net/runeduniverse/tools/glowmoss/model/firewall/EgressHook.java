@@ -18,7 +18,6 @@ package net.runeduniverse.tools.glowmoss.model.firewall;
 import lombok.Getter;
 import lombok.Setter;
 import net.runeduniverse.lib.rogm.annotations.NodeEntity;
-import net.runeduniverse.tools.glowmoss.model.firewall.ip.OutputHook;
 
 @NodeEntity(label = "EGRESS")
 @Getter

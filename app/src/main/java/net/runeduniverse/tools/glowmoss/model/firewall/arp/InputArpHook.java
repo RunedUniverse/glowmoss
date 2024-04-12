@@ -25,7 +25,7 @@ import net.runeduniverse.tools.glowmoss.model.firewall.ip.OutputHook;
 @NodeEntity(label = InputArpHook.LABEL)
 @Getter
 @Setter
-public class InputArpHook extends ArpHook implements Hook {
+public class InputArpHook extends ArpHook {
 
 	protected static final String LABEL = "INPUT_ARP";
 

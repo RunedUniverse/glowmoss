@@ -20,13 +20,12 @@ import lombok.Setter;
 import net.runeduniverse.lib.rogm.annotations.NodeEntity;
 import net.runeduniverse.lib.rogm.annotations.Relationship;
 import net.runeduniverse.tools.glowmoss.model.firewall.EgressHook;
-import net.runeduniverse.tools.glowmoss.model.firewall.Hook;
 import net.runeduniverse.tools.glowmoss.model.firewall.bridge.OutputBridgeHook;
 
 @NodeEntity(label = PostroutingHook.LABEL)
 @Getter
 @Setter
-public class PostroutingHook extends IpHook implements Hook {
+public class PostroutingHook extends IpHook {
 
 	protected static final String LABEL = "POSTROUTING";
 

@@ -19,13 +19,12 @@ import lombok.Getter;
 import lombok.Setter;
 import net.runeduniverse.lib.rogm.annotations.NodeEntity;
 import net.runeduniverse.lib.rogm.annotations.Relationship;
-import net.runeduniverse.tools.glowmoss.model.firewall.Hook;
 import net.runeduniverse.tools.glowmoss.model.firewall.app.LocalProcess;
 
 @NodeEntity(label = InputHook.LABEL)
 @Getter
 @Setter
-public class InputHook extends IpHook implements Hook {
+public class InputHook extends IpHook {
 
 	protected static final String LABEL = "INPUT";
 

@@ -19,12 +19,11 @@ import lombok.Getter;
 import lombok.Setter;
 import net.runeduniverse.lib.rogm.annotations.NodeEntity;
 import net.runeduniverse.lib.rogm.annotations.Relationship;
-import net.runeduniverse.tools.glowmoss.model.firewall.Hook;
 
 @NodeEntity(label = PreroutingBridgeHook.LABEL)
 @Getter
 @Setter
-public class PreroutingBridgeHook extends BridgeHook implements Hook {
+public class PreroutingBridgeHook extends BridgeHook {
 
 	protected static final String LABEL = "PREROUTING_BRIDGE";
 

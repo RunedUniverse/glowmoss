@@ -26,7 +26,7 @@ import net.runeduniverse.tools.glowmoss.model.firewall.ip.PreroutingHook;
 @NodeEntity(label = InputBridgeHook.LABEL)
 @Getter
 @Setter
-public class InputBridgeHook extends BridgeHook implements Hook {
+public class InputBridgeHook extends BridgeHook {
 
 	protected static final String LABEL = "INPUT_BRIDGE";
 
