@@ -36,7 +36,8 @@ import net.runeduniverse.tools.glowmoss.model.firewall.ip.PostroutingHook;
 import net.runeduniverse.tools.glowmoss.model.firewall.ip.PreroutingHook;
 
 @Getter
-public class FirewallHandler {
+//@NodeEntity(label = "FIREWALL")
+public class Firewall {
 
 	// Application Layer
 	protected LocalProcess localProcess;
@@ -64,7 +65,7 @@ public class FirewallHandler {
 	protected IngressHook hookIngress;
 	protected EgressHook hookEgress;
 
-	public FirewallHandler() {
+	public Firewall() {
 	}
 
 	void init() {
@@ -177,8 +178,8 @@ public class FirewallHandler {
 			consumer.accept((T) obj);
 	}
 
-	public static FirewallHandler create() {
-		final FirewallHandler handler = new FirewallHandler();
+	public static Firewall create() {
+		final Firewall handler = new Firewall();
 
 		handler.init();
 		handler.relink();

@@ -14,7 +14,8 @@
 # limitations under the License.
 #
 
-# /usr/bin/bash
+#!/usr/bin/bash
+set -e
 
 mvn dev/install] -pl api,app
 

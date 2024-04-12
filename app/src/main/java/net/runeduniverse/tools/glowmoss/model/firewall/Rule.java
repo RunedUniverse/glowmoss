@@ -36,7 +36,7 @@ public class Rule extends AEntity {
 	private Rule next;
 
 	@Setter
-	@Relationship(label = REL_LABEL_JUMP, direction = Direction.BIDIRECTIONAL)
+	@Relationship(label = REL_LABEL_JUMP, direction = Direction.OUTGOING)
 	private Chain jumpTo = null;
 
 	@Setter

@@ -58,6 +58,7 @@ public class Table extends AEntity {
 
 	public BaseChain createBaseChain(final String name, final ChainType type, final Hook hook, final Integer priority) {
 		final BaseChain chain = new BaseChain();
+		chain.setName(name);
 		chain.setType(type);
 		chain.setHook(hook);
 		chain.setEffPriority(priority);

@@ -1,0 +1,647 @@
+table inet firewalld {
+	ct helper helper-netbios-ns-udp {
+		type "netbios-ns" protocol udp
+		l3proto ip
+	}
+
+	set runeduniverse-dev-masters {
+		type ipv4_addr
+		flags interval
+		elements = { 10.20.0.1, 10.27.0.1 }
+	}
+
+	chain mangle_PREROUTING {
+		type filter hook prerouting priority mangle + 10; policy accept;
+		jump mangle_PREROUTING_ZONES
+	}
+
+	chain mangle_PREROUTING_POLICIES_pre {
+		jump mangle_PRE_policy_allow-host-ipv6
+	}
+
+	chain mangle_PREROUTING_ZONES {
+		iifname "rnet" goto mangle_PRE_internal
+		iifname "enp67s0" goto mangle_PRE_home
+		iifname "wg0" goto mangle_PRE_internal
+		goto mangle_PRE_FedoraWorkstation
+	}
+
+	chain mangle_PREROUTING_POLICIES_post {
+	}
+
+	chain nat_PREROUTING {
+		type nat hook prerouting priority dstnat + 10; policy accept;
+		jump nat_PREROUTING_ZONES
+	}
+
+	chain nat_PREROUTING_POLICIES_pre {
+		jump nat_PRE_policy_allow-host-ipv6
+	}
+
+	chain nat_PREROUTING_ZONES {
+		iifname "rnet" goto nat_PRE_internal
+		iifname "enp67s0" goto nat_PRE_home
+		iifname "wg0" goto nat_PRE_internal
+		goto nat_PRE_FedoraWorkstation
+	}
+
+	chain nat_PREROUTING_POLICIES_post {
+	}
+
+	chain nat_POSTROUTING {
+		type nat hook postrouting priority srcnat + 10; policy accept;
+		jump nat_POSTROUTING_ZONES
+	}
+
+	chain nat_POSTROUTING_POLICIES_pre {
+	}
+
+	chain nat_POSTROUTING_ZONES {
+		oifname "rnet" goto nat_POST_internal
+		oifname "enp67s0" goto nat_POST_home
+		oifname "wg0" goto nat_POST_internal
+		goto nat_POST_FedoraWorkstation
+	}
+
+	chain nat_POSTROUTING_POLICIES_post {
+	}
+
+	chain nat_OUTPUT {
+		type nat hook output priority -90; policy accept;
+		jump nat_OUTPUT_POLICIES_pre
+		jump nat_OUTPUT_POLICIES_post
+	}
+
+	chain nat_OUTPUT_POLICIES_pre {
+	}
+
+	chain nat_OUTPUT_POLICIES_post {
+	}
+
+	chain filter_PREROUTING {
+		type filter hook prerouting priority filter + 10; policy accept;
+		icmpv6 type { nd-router-advert, nd-neighbor-solicit } accept
+		meta nfproto ipv6 fib saddr . mark . iif oif missing drop
+	}
+
+	chain filter_INPUT {
+		type filter hook input priority filter + 10; policy accept;
+		ct state { established, related } accept
+		ct status dnat accept
+		iifname "lo" accept
+		ct state invalid drop
+		jump filter_INPUT_ZONES
+		reject with icmpx admin-prohibited
+	}
+
+	chain filter_FORWARD {
+		type filter hook forward priority filter + 10; policy accept;
+		ct state { established, related } accept
+		ct status dnat accept
+		iifname "lo" accept
+		ct state invalid drop
+		ip6 daddr { ::/96, ::ffff:0.0.0.0/96, 2002::/24, 2002:a00::/24, 2002:7f00::/24, 2002:a9fe::/32, 2002:ac10::/28, 2002:c0a8::/32, 2002:e000::/19 } reject with icmpv6 addr-unreachable
+		jump filter_FORWARD_ZONES
+		reject with icmpx admin-prohibited
+	}
+
+	chain filter_OUTPUT {
+		type filter hook output priority filter + 10; policy accept;
+		ct state { established, related } accept
+		oifname "lo" accept
+		ip6 daddr { ::/96, ::ffff:0.0.0.0/96, 2002::/24, 2002:a00::/24, 2002:7f00::/24, 2002:a9fe::/32, 2002:ac10::/28, 2002:c0a8::/32, 2002:e000::/19 } reject with icmpv6 addr-unreachable
+		jump filter_OUTPUT_POLICIES_pre
+		jump filter_OUTPUT_POLICIES_post
+	}
+
+	chain filter_INPUT_POLICIES_pre {
+		jump filter_IN_policy_allow-host-ipv6
+	}
+
+	chain filter_INPUT_ZONES {
+		iifname "rnet" goto filter_IN_internal
+		iifname "enp67s0" goto filter_IN_home
+		iifname "wg0" goto filter_IN_internal
+		goto filter_IN_FedoraWorkstation
+	}
+
+	chain filter_INPUT_POLICIES_post {
+	}
+
+	chain filter_FORWARD_POLICIES_pre {
+	}
+
+	chain filter_FORWARD_ZONES {
+		iifname "rnet" goto filter_FWD_internal
+		iifname "enp67s0" goto filter_FWD_home
+		iifname "wg0" goto filter_FWD_internal
+		goto filter_FWD_FedoraWorkstation
+	}
+
+	chain filter_FORWARD_POLICIES_post {
+	}
+
+	chain filter_OUTPUT_POLICIES_pre {
+	}
+
+	chain filter_OUTPUT_POLICIES_post {
+	}
+
+	chain filter_IN_FedoraWorkstation {
+		jump filter_INPUT_POLICIES_pre
+		jump filter_IN_FedoraWorkstation_pre
+		jump filter_IN_FedoraWorkstation_log
+		jump filter_IN_FedoraWorkstation_deny
+		jump filter_IN_FedoraWorkstation_allow
+		jump filter_IN_FedoraWorkstation_post
+		jump filter_INPUT_POLICIES_post
+		meta l4proto { icmp, ipv6-icmp } accept
+		reject with icmpx admin-prohibited
+	}
+
+	chain filter_IN_FedoraWorkstation_pre {
+	}
+
+	chain filter_IN_FedoraWorkstation_log {
+	}
+
+	chain filter_IN_FedoraWorkstation_deny {
+	}
+
+	chain filter_IN_FedoraWorkstation_allow {
+		ip6 daddr fe80::/64 udp dport 546 accept
+		tcp dport 22 accept
+		udp dport 137 ct helper set "helper-netbios-ns-udp"
+		udp dport 137 accept
+		udp dport 138 accept
+		ip daddr 224.0.0.251 udp dport 5353 accept
+		ip6 daddr ff02::fb udp dport 5353 accept
+		udp dport 631 accept
+		tcp dport 631 accept
+		tcp dport 2049 accept
+		udp dport 2049 accept
+		tcp dport 20048 accept
+		udp dport 20048 accept
+		tcp dport 111 accept
+		udp dport 111 accept
+		udp dport 1025-65535 accept
+		tcp dport 1025-65535 accept
+	}
+
+	chain filter_IN_FedoraWorkstation_post {
+	}
+
+	chain nat_POST_FedoraWorkstation {
+		jump nat_POSTROUTING_POLICIES_pre
+		jump nat_POST_FedoraWorkstation_pre
+		jump nat_POST_FedoraWorkstation_log
+		jump nat_POST_FedoraWorkstation_deny
+		jump nat_POST_FedoraWorkstation_allow
+		jump nat_POST_FedoraWorkstation_post
+		jump nat_POSTROUTING_POLICIES_post
+	}
+
+	chain nat_POST_FedoraWorkstation_pre {
+	}
+
+	chain nat_POST_FedoraWorkstation_log {
+	}
+
+	chain nat_POST_FedoraWorkstation_deny {
+	}
+
+	chain nat_POST_FedoraWorkstation_allow {
+	}
+
+	chain nat_POST_FedoraWorkstation_post {
+	}
+
+	chain filter_FWD_FedoraWorkstation {
+		jump filter_FORWARD_POLICIES_pre
+		jump filter_FWD_FedoraWorkstation_pre
+		jump filter_FWD_FedoraWorkstation_log
+		jump filter_FWD_FedoraWorkstation_deny
+		jump filter_FWD_FedoraWorkstation_allow
+		jump filter_FWD_FedoraWorkstation_post
+		jump filter_FORWARD_POLICIES_post
+		reject with icmpx admin-prohibited
+	}
+
+	chain filter_FWD_FedoraWorkstation_pre {
+	}
+
+	chain filter_FWD_FedoraWorkstation_log {
+	}
+
+	chain filter_FWD_FedoraWorkstation_deny {
+	}
+
+	chain filter_FWD_FedoraWorkstation_allow {
+	}
+
+	chain filter_FWD_FedoraWorkstation_post {
+	}
+
+	chain nat_PRE_FedoraWorkstation {
+		jump nat_PREROUTING_POLICIES_pre
+		jump nat_PRE_FedoraWorkstation_pre
+		jump nat_PRE_FedoraWorkstation_log
+		jump nat_PRE_FedoraWorkstation_deny
+		jump nat_PRE_FedoraWorkstation_allow
+		jump nat_PRE_FedoraWorkstation_post
+		jump nat_PREROUTING_POLICIES_post
+	}
+
+	chain nat_PRE_FedoraWorkstation_pre {
+	}
+
+	chain nat_PRE_FedoraWorkstation_log {
+	}
+
+	chain nat_PRE_FedoraWorkstation_deny {
+	}
+
+	chain nat_PRE_FedoraWorkstation_allow {
+	}
+
+	chain nat_PRE_FedoraWorkstation_post {
+	}
+
+	chain mangle_PRE_FedoraWorkstation {
+		jump mangle_PREROUTING_POLICIES_pre
+		jump mangle_PRE_FedoraWorkstation_pre
+		jump mangle_PRE_FedoraWorkstation_log
+		jump mangle_PRE_FedoraWorkstation_deny
+		jump mangle_PRE_FedoraWorkstation_allow
+		jump mangle_PRE_FedoraWorkstation_post
+		jump mangle_PREROUTING_POLICIES_post
+	}
+
+	chain mangle_PRE_FedoraWorkstation_pre {
+	}
+
+	chain mangle_PRE_FedoraWorkstation_log {
+	}
+
+	chain mangle_PRE_FedoraWorkstation_deny {
+	}
+
+	chain mangle_PRE_FedoraWorkstation_allow {
+	}
+
+	chain mangle_PRE_FedoraWorkstation_post {
+	}
+
+	chain filter_IN_policy_allow-host-ipv6 {
+		jump filter_IN_policy_allow-host-ipv6_pre
+		jump filter_IN_policy_allow-host-ipv6_log
+		jump filter_IN_policy_allow-host-ipv6_deny
+		jump filter_IN_policy_allow-host-ipv6_allow
+		jump filter_IN_policy_allow-host-ipv6_post
+	}
+
+	chain filter_IN_policy_allow-host-ipv6_pre {
+	}
+
+	chain filter_IN_policy_allow-host-ipv6_log {
+	}
+
+	chain filter_IN_policy_allow-host-ipv6_deny {
+	}
+
+	chain filter_IN_policy_allow-host-ipv6_allow {
+		icmpv6 type nd-neighbor-advert accept
+		icmpv6 type nd-neighbor-solicit accept
+		icmpv6 type nd-router-advert accept
+		icmpv6 type nd-redirect accept
+	}
+
+	chain filter_IN_policy_allow-host-ipv6_post {
+	}
+
+	chain nat_PRE_policy_allow-host-ipv6 {
+		jump nat_PRE_policy_allow-host-ipv6_pre
+		jump nat_PRE_policy_allow-host-ipv6_log
+		jump nat_PRE_policy_allow-host-ipv6_deny
+		jump nat_PRE_policy_allow-host-ipv6_allow
+		jump nat_PRE_policy_allow-host-ipv6_post
+	}
+
+	chain nat_PRE_policy_allow-host-ipv6_pre {
+	}
+
+	chain nat_PRE_policy_allow-host-ipv6_log {
+	}
+
+	chain nat_PRE_policy_allow-host-ipv6_deny {
+	}
+
+	chain nat_PRE_policy_allow-host-ipv6_allow {
+	}
+
+	chain nat_PRE_policy_allow-host-ipv6_post {
+	}
+
+	chain mangle_PRE_policy_allow-host-ipv6 {
+		jump mangle_PRE_policy_allow-host-ipv6_pre
+		jump mangle_PRE_policy_allow-host-ipv6_log
+		jump mangle_PRE_policy_allow-host-ipv6_deny
+		jump mangle_PRE_policy_allow-host-ipv6_allow
+		jump mangle_PRE_policy_allow-host-ipv6_post
+	}
+
+	chain mangle_PRE_policy_allow-host-ipv6_pre {
+	}
+
+	chain mangle_PRE_policy_allow-host-ipv6_log {
+	}
+
+	chain mangle_PRE_policy_allow-host-ipv6_deny {
+	}
+
+	chain mangle_PRE_policy_allow-host-ipv6_allow {
+	}
+
+	chain mangle_PRE_policy_allow-host-ipv6_post {
+	}
+
+	chain filter_IN_internal {
+		jump filter_INPUT_POLICIES_pre
+		jump filter_IN_internal_pre
+		jump filter_IN_internal_log
+		jump filter_IN_internal_deny
+		jump filter_IN_internal_allow
+		jump filter_IN_internal_post
+		jump filter_INPUT_POLICIES_post
+		meta l4proto { icmp, ipv6-icmp } accept
+		reject with icmpx admin-prohibited
+	}
+
+	chain filter_IN_internal_pre {
+	}
+
+	chain filter_IN_internal_log {
+	}
+
+	chain filter_IN_internal_deny {
+	}
+
+	chain filter_IN_internal_allow {
+		tcp dport 22 accept
+		ip daddr 224.0.0.251 udp dport 5353 accept
+		ip6 daddr ff02::fb udp dport 5353 accept
+		udp dport 137 ct helper set "helper-netbios-ns-udp"
+		udp dport 137 accept
+		udp dport 138 accept
+		ip6 daddr fe80::/64 udp dport 546 accept
+		tcp dport 9090 accept
+		tcp dport 25565 accept
+		tcp dport 8181 accept
+		ip daddr 10.20.0.1 ip saddr @runeduniverse-dev-masters tcp dport 25575 accept
+	}
+
+	chain filter_IN_internal_post {
+	}
+
+	chain nat_POST_internal {
+		jump nat_POSTROUTING_POLICIES_pre
+		jump nat_POST_internal_pre
+		jump nat_POST_internal_log
+		jump nat_POST_internal_deny
+		jump nat_POST_internal_allow
+		jump nat_POST_internal_post
+		jump nat_POSTROUTING_POLICIES_post
+	}
+
+	chain nat_POST_internal_pre {
+	}
+
+	chain nat_POST_internal_log {
+	}
+
+	chain nat_POST_internal_deny {
+	}
+
+	chain nat_POST_internal_allow {
+	}
+
+	chain nat_POST_internal_post {
+	}
+
+	chain filter_FWD_internal {
+		jump filter_FORWARD_POLICIES_pre
+		jump filter_FWD_internal_pre
+		jump filter_FWD_internal_log
+		jump filter_FWD_internal_deny
+		jump filter_FWD_internal_allow
+		jump filter_FWD_internal_post
+		jump filter_FORWARD_POLICIES_post
+		reject with icmpx admin-prohibited
+	}
+
+	chain filter_FWD_internal_pre {
+	}
+
+	chain filter_FWD_internal_log {
+	}
+
+	chain filter_FWD_internal_deny {
+	}
+
+	chain filter_FWD_internal_allow {
+		oifname "wg0" accept
+		oifname "rnet" accept
+	}
+
+	chain filter_FWD_internal_post {
+	}
+
+	chain nat_PRE_internal {
+		jump nat_PREROUTING_POLICIES_pre
+		jump nat_PRE_internal_pre
+		jump nat_PRE_internal_log
+		jump nat_PRE_internal_deny
+		jump nat_PRE_internal_allow
+		jump nat_PRE_internal_post
+		jump nat_PREROUTING_POLICIES_post
+	}
+
+	chain nat_PRE_internal_pre {
+	}
+
+	chain nat_PRE_internal_log {
+	}
+
+	chain nat_PRE_internal_deny {
+	}
+
+	chain nat_PRE_internal_allow {
+	}
+
+	chain nat_PRE_internal_post {
+	}
+
+	chain mangle_PRE_internal {
+		jump mangle_PREROUTING_POLICIES_pre
+		jump mangle_PRE_internal_pre
+		jump mangle_PRE_internal_log
+		jump mangle_PRE_internal_deny
+		jump mangle_PRE_internal_allow
+		jump mangle_PRE_internal_post
+		jump mangle_PREROUTING_POLICIES_post
+	}
+
+	chain mangle_PRE_internal_pre {
+	}
+
+	chain mangle_PRE_internal_log {
+	}
+
+	chain mangle_PRE_internal_deny {
+	}
+
+	chain mangle_PRE_internal_allow {
+	}
+
+	chain mangle_PRE_internal_post {
+	}
+
+	chain filter_IN_home {
+		jump filter_INPUT_POLICIES_pre
+		jump filter_IN_home_pre
+		jump filter_IN_home_log
+		jump filter_IN_home_deny
+		jump filter_IN_home_allow
+		jump filter_IN_home_post
+		jump filter_INPUT_POLICIES_post
+		meta l4proto { icmp, ipv6-icmp } accept
+		reject with icmpx admin-prohibited
+	}
+
+	chain filter_IN_home_pre {
+	}
+
+	chain filter_IN_home_log {
+	}
+
+	chain filter_IN_home_deny {
+	}
+
+	chain filter_IN_home_allow {
+		tcp dport 22 accept
+		ip daddr 224.0.0.251 udp dport 5353 accept
+		ip6 daddr ff02::fb udp dport 5353 accept
+		udp dport 137 ct helper set "helper-netbios-ns-udp"
+		udp dport 137 accept
+		udp dport 138 accept
+		ip6 daddr fe80::/64 udp dport 546 accept
+		tcp dport 2049 accept
+		udp dport 2049 accept
+		tcp dport 9090 accept
+	}
+
+	chain filter_IN_home_post {
+	}
+
+	chain nat_POST_home {
+		jump nat_POSTROUTING_POLICIES_pre
+		jump nat_POST_home_pre
+		jump nat_POST_home_log
+		jump nat_POST_home_deny
+		jump nat_POST_home_allow
+		jump nat_POST_home_post
+		jump nat_POSTROUTING_POLICIES_post
+	}
+
+	chain nat_POST_home_pre {
+	}
+
+	chain nat_POST_home_log {
+	}
+
+	chain nat_POST_home_deny {
+	}
+
+	chain nat_POST_home_allow {
+	}
+
+	chain nat_POST_home_post {
+	}
+
+	chain filter_FWD_home {
+		jump filter_FORWARD_POLICIES_pre
+		jump filter_FWD_home_pre
+		jump filter_FWD_home_log
+		jump filter_FWD_home_deny
+		jump filter_FWD_home_allow
+		jump filter_FWD_home_post
+		jump filter_FORWARD_POLICIES_post
+		reject with icmpx admin-prohibited
+	}
+
+	chain filter_FWD_home_pre {
+	}
+
+	chain filter_FWD_home_log {
+	}
+
+	chain filter_FWD_home_deny {
+	}
+
+	chain filter_FWD_home_allow {
+		oifname "enp67s0" accept
+	}
+
+	chain filter_FWD_home_post {
+	}
+
+	chain nat_PRE_home {
+		jump nat_PREROUTING_POLICIES_pre
+		jump nat_PRE_home_pre
+		jump nat_PRE_home_log
+		jump nat_PRE_home_deny
+		jump nat_PRE_home_allow
+		jump nat_PRE_home_post
+		jump nat_PREROUTING_POLICIES_post
+	}
+
+	chain nat_PRE_home_pre {
+	}
+
+	chain nat_PRE_home_log {
+	}
+
+	chain nat_PRE_home_deny {
+	}
+
+	chain nat_PRE_home_allow {
+	}
+
+	chain nat_PRE_home_post {
+	}
+
+	chain mangle_PRE_home {
+		jump mangle_PREROUTING_POLICIES_pre
+		jump mangle_PRE_home_pre
+		jump mangle_PRE_home_log
+		jump mangle_PRE_home_deny
+		jump mangle_PRE_home_allow
+		jump mangle_PRE_home_post
+		jump mangle_PREROUTING_POLICIES_post
+	}
+
+	chain mangle_PRE_home_pre {
+	}
+
+	chain mangle_PRE_home_log {
+	}
+
+	chain mangle_PRE_home_deny {
+	}
+
+	chain mangle_PRE_home_allow {
+	}
+
+	chain mangle_PRE_home_post {
+	}
+}
