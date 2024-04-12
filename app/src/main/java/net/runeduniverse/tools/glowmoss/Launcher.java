@@ -65,6 +65,7 @@ public class Launcher {
 			@Override
 			protected void setupChainManager(ChainManager chainManager) throws Exception {
 				chainManager.addChainLayers(Launcher.class);
+				chainManager.addChainLayers(RogmPatches.class);
 				super.setupChainManager(chainManager);
 			}
 
