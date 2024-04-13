@@ -109,20 +109,24 @@ public class FirewallParser {
 					.put(name, tmpChain = new TmpChain());
 		}
 		List<String> rawRules = tmpChain.getRawRules();
-		boolean start = true;
+		boolean parseHeader = true;
 		for (String line = reader.readLine(); line != null; line = reader.readLine()) {
 			line = line.trim();
 			if ("}".equals(line))
-				return true;
+				break;
 			if (line.isEmpty())
 				continue;
 
-			if (start) {
+			if (parseHeader) {
 				initFwChain(tmpTable, tmpChain, name, line);
-				start = false;
+				parseHeader = false;
 				continue;
 			}
 			rawRules.add(line);
+		}
+		if (parseHeader) {
+			// init chain in case the chain has no rules!
+			tmpChain.setChain(new Chain().setName(name));
 		}
 		return true;
 	}
@@ -213,7 +217,7 @@ public class FirewallParser {
 			if ("}".equals(line)) {
 				// end
 				content.append("\n}");
-				return true;
+				break;
 			}
 			if (line.isEmpty())
 				continue;
@@ -236,7 +240,7 @@ public class FirewallParser {
 			if ("}".equals(line)) {
 				// end
 				content.append("\n}");
-				return true;
+				break;
 			}
 			if (line.isEmpty())
 				continue;
