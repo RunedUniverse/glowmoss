@@ -20,5 +20,4 @@ set -e
 mvn dev/install] -pl api,app
 
 printf "=== starting ===\n"
-/usr/lib/jvm/java-1.8.0/bin/java -jar app/target/glowmoss-app-0.0.0.jar
-
+/usr/lib/jvm/java-1.8.0/bin/java -jar app/target/glowmoss-app-0.0.0.jar $@

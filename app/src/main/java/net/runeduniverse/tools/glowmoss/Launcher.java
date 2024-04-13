@@ -26,7 +26,6 @@ import java.util.logging.Logger;
 import net.runeduniverse.lib.rogm.Configuration;
 import net.runeduniverse.lib.rogm.Session;
 import net.runeduniverse.lib.rogm.lang.Language.IMapper;
-import net.runeduniverse.lib.rogm.modules.neo4j.Neo4jConfiguration;
 import net.runeduniverse.lib.rogm.pipeline.DatabasePipelineFactory;
 import net.runeduniverse.lib.rogm.pipeline.Pipeline;
 import net.runeduniverse.lib.rogm.pipeline.chain.Chains;
@@ -34,12 +33,7 @@ import net.runeduniverse.lib.rogm.querying.QueryBuilder;
 import net.runeduniverse.lib.rogm.querying.QueryBuilder.NodeQueryBuilder;
 import net.runeduniverse.lib.rogm.querying.QueryBuilder.RelationQueryBuilder;
 import net.runeduniverse.lib.utils.chain.ChainManager;
-import net.runeduniverse.tools.glowmoss.model.firewall.Chain;
-import net.runeduniverse.tools.glowmoss.model.firewall.ChainType;
-import net.runeduniverse.tools.glowmoss.model.firewall.Family;
 import net.runeduniverse.tools.glowmoss.model.firewall.Firewall;
-import net.runeduniverse.tools.glowmoss.model.firewall.Rule;
-import net.runeduniverse.tools.glowmoss.model.firewall.Table;
 import net.runeduniverse.tools.glowmoss.model.network.Bridge;
 import net.runeduniverse.tools.glowmoss.model.network.Interface;
 import net.runeduniverse.tools.glowmoss.model.network.Namespace;
@@ -49,24 +43,28 @@ import net.runeduniverse.tools.glowmoss.parser.FirewallParser;
 
 public class Launcher {
 
+	private static ConsoleLogger logger = new ConsoleLogger(Logger.getLogger(Launcher.class.getName()));
+
+	private static Options options = new Options();
 	private static Configuration dbCnf;
 	private static QueryBuilder qryBuilder;
 
-	private static ConsoleLogger logger;
-
-	// private static Archive archive;
-
 	public static void main(String[] args) {
-		logger = new ConsoleLogger(Logger.getLogger(Launcher.class.getName()));
 		RogmPatches.patch();
 
-		// TODO Auto-generated method stub
+		if (!options.init(args)) {
+			System.err.println("Invalid arguments detected, stopping!");
+			return;
+		}
 
-		dbCnf = configureDB();
+		dbCnf = options.dbConfig();
 
-		// dbCnf.setLogger(logger);
+		if (options.debug()) {
+			dbCnf.setLogger(logger);
+		}
 
-		Pipeline pipe = new Pipeline(new DatabasePipelineFactory(dbCnf) {
+		final Pipeline pipe = new Pipeline(new DatabasePipelineFactory(dbCnf) {
+
 			@Override
 			protected void setupChainManager(ChainManager chainManager) throws Exception {
 				chainManager.addChainLayers(Launcher.class);
@@ -74,11 +72,6 @@ public class Launcher {
 				super.setupChainManager(chainManager);
 			}
 
-			// @Override
-			// protected void setupArchive(Archive archive) throws ScannerException {
-			// Launcher.archive = archive;
-			// super.setupArchive(archive);
-			// }
 		});
 
 		try (Session dbSession = pipe.buildSession()) {
@@ -86,7 +79,6 @@ public class Launcher {
 
 			// initHost(dbSession);
 			createFW(dbSession);
-			// logPatterns(ForwardBridgeHook.class);
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -95,9 +87,11 @@ public class Launcher {
 
 	@net.runeduniverse.lib.utils.chain.Chain(label = Chains.SAVE_CHAIN.ONE.LABEL, layers = { 199 })
 	public static void debug(IMapper mapper) {
+		if (!options.log())
+			return;
+		System.err.println();
+		System.err.println();
 		System.err.println(mapper.qry());
-		System.err.println();
-		System.err.println();
 	}
 
 	private static void createFW(Session session) {
@@ -105,32 +99,17 @@ public class Launcher {
 
 		FirewallParser parser = new FirewallParser(firewall);
 
+		Path ruleset = options.nftRuleset();
+		if (ruleset == null)
+			return;
+
 		try {
-			parser.parse(
-					Paths.get("/data/userdata/code/java/RunedUniverse/glowmoss/src/main/resources", "ruleset.txt"));
+			parser.parse(ruleset);
+			// parser.parse(Paths.get("/data/userdata/code/java/RunedUniverse/glowmoss/src/main/resources",
+			// "ruleset.txt"));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-
-		// Table table = new Table();
-		// table.setFamily(Family.INET);
-		// table.setName("basic-filter");
-		//
-		// Chain netavarkInputChain = table.createChain("NETAVARK_INPUT",
-		// ChainType.FILTER);
-		// Chain netavarkForwardChain = table.createChain("NETAVARK_FORWARD",
-		// ChainType.FILTER);
-		//
-		// table.createBaseChain("input-filter", ChainType.FILTER,
-		// firewall.getIpHookInput(), 0)
-		// .addRule(new Rule().setContent("ct state established,related accept"))
-		// .addRule(new Rule().setContent("ip saddr 10.1.1.1 tcp dport ssh accept"))
-		// .addRule(new Rule().setContent("ip saddr 10.88.0.0/16")
-		// .setGoTo(netavarkInputChain));
-		// table.createBaseChain("forward-filter", ChainType.FILTER,
-		// firewall.getIpHookForward(), 0)
-		// .addRule(new Rule().setContent("ip saddr 10.88.0.0./16")
-		// .setJumpTo(netavarkForwardChain));
 
 		firewall.save(session);
 		// session.save(table, 20);
@@ -140,17 +119,6 @@ public class Launcher {
 	private static void initHost(Session session) {
 		Host host = getHost(session, "rocky-vm");
 
-		// Chain postRt = new Chain();
-		// postRt.setName("POSTROUTING");
-		// postRt.setTable("NAT");
-		// Chain preRt = new Chain();
-		// preRt.setName("PREROUTING");
-		// preRt.setTable("NAT");
-		//
-		// host.addFwChain(postRt);
-		// host.addFwChain(preRt);
-		//
-		// session.saveAll(host.getFirewallChains());
 		session.save(host, 7);
 
 		///////////////////////////////////////////////////////////////////////
@@ -235,26 +203,6 @@ public class Launcher {
 
 	private static RelationQueryBuilder qryRelation() {
 		return qryBuilder.relation();
-	}
-
-	private static Configuration configureDB() {
-		Neo4jConfiguration dbCnf = new Neo4jConfiguration("10.88.0.2");
-		// register model package
-		dbCnf.addPackage("net.runeduniverse.tools.glowmoss.model");
-		dbCnf.addPackage("net.runeduniverse.tools.glowmoss.model.firewall");
-		dbCnf.addPackage("net.runeduniverse.tools.glowmoss.model.firewall.app");
-		dbCnf.addPackage("net.runeduniverse.tools.glowmoss.model.firewall.arp");
-		dbCnf.addPackage("net.runeduniverse.tools.glowmoss.model.firewall.bridge");
-		dbCnf.addPackage("net.runeduniverse.tools.glowmoss.model.firewall.ip");
-		// dbCnf.addPackage("net.runeduniverse.tools.glowmoss.model.network");
-		// dbCnf.addPackage("net.runeduniverse.tools.glowmoss.model.server");
-		// dbCnf.addPackage("net.runeduniverse.tools.glowmoss.model.server.rel");
-		// set classloader
-		dbCnf.addClassLoader(Launcher.class.getClassLoader());
-		// set credentials
-		dbCnf.setUser("neo4j");
-		dbCnf.setPassword("glowmoss");
-		return dbCnf;
 	}
 
 }
