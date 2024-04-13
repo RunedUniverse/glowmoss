@@ -49,15 +49,6 @@ public class Chain extends AEntity {
 	@Setter
 	private String name;
 
-	// default = 'filter'
-	@Getter
-	@Setter
-	private ChainType type = ChainType.FILTER;
-
-	@Getter
-	@Setter
-	private String policy = null;
-
 	@Relationship(label = "NEXT")
 	private Rule firstRule;
 

@@ -19,6 +19,7 @@ import java.util.LinkedList;
 import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.experimental.Accessors;
 import net.runeduniverse.lib.rogm.annotations.NodeEntity;
 import net.runeduniverse.lib.rogm.annotations.Relationship;
 import net.runeduniverse.tools.glowmoss.model.AEntity;
@@ -33,11 +34,14 @@ import net.runeduniverse.tools.glowmoss.model.AEntity;
  */
 @Getter
 @NodeEntity(label = "TABLE")
+@Accessors(chain = true)
 public class Table extends AEntity {
 
 	// IP is default
+	public static final Family DEFAULT_FAMILY = Family.IP;
+
 	@Setter
-	private Family family = Family.IP;
+	private Family family = DEFAULT_FAMILY;
 
 	@Setter
 	private String name;
@@ -73,18 +77,22 @@ public class Table extends AEntity {
 		return chain;
 	}
 
-	public void addChain(final Chain chain) {
+	public Table addChain(final Chain chain) {
+		if (chain == null)
+			return this;
 		synchronized (this.chains) {
 			chain.setTable(this);
 			this.chains.add(chain);
 		}
+		return this;
 	}
 
-	public void removeChain(final Chain chain) {
+	public Table removeChain(final Chain chain) {
 		synchronized (this.chains) {
 			chain.setTable(null);
 			this.chains.remove(chain);
 		}
+		return this;
 	}
 
 }

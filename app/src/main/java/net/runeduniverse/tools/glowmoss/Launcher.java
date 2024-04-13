@@ -103,10 +103,8 @@ public class Launcher {
 		table.setFamily(Family.INET);
 		table.setName("basic-filter");
 
-		Chain netavarkInputChain = table.createChain("NETAVARK_INPUT", ChainType.FILTER)
-				.setPolicy("accept");
-		Chain netavarkForwardChain = table.createChain("NETAVARK_FORWARD", ChainType.FILTER)
-				.setPolicy("accept");
+		Chain netavarkInputChain = table.createChain("NETAVARK_INPUT", ChainType.FILTER);
+		Chain netavarkForwardChain = table.createChain("NETAVARK_FORWARD", ChainType.FILTER);
 
 		table.createBaseChain("input-filter", ChainType.FILTER, handler.getIpHookInput(), 0)
 				.addRule(new Rule().setContent("ct state established,related accept"))

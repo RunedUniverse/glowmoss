@@ -17,6 +17,25 @@ package net.runeduniverse.tools.glowmoss.model.firewall;
 
 public enum Family {
 
-	NETDEV, INET, IP, IP6, BRIDGE, ARP;
+	NETDEV("netdev"), INET("inet"), IP("ip"), IP6("ip6"), BRIDGE("bridge"), ARP("arp");
+
+	private final String text;
+
+	private Family(final String text) {
+		this.text = text;
+	}
+
+	public String text() {
+		return this.text;
+	}
+
+	public static Family find(String text) {
+		for (Family family : values()) {
+			if (family.text()
+					.equals(text))
+				return family;
+		}
+		return null;
+	}
 
 }

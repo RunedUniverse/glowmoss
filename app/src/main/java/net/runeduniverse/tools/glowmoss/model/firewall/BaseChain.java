@@ -30,6 +30,11 @@ public class BaseChain extends Chain {
 
 	public static final String REL_LABEL_HOOK = "CALLS";
 
+	// default = 'filter'
+	@Getter
+	@Setter
+	private ChainType type = ChainType.FILTER;
+
 	@Setter
 	@Transient
 	@Relationship(label = REL_LABEL_HOOK, direction = Direction.INCOMING)
@@ -85,5 +90,8 @@ public class BaseChain extends Chain {
 	private String priority = "";
 	@Setter
 	private Integer effPriority = 0;
+
+	@Setter
+	private String policy = null;
 
 }

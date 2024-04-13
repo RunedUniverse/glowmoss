@@ -17,6 +17,25 @@ package net.runeduniverse.tools.glowmoss.model.firewall;
 
 public enum ChainType {
 
-	FILTER, NAT, ROUTE;
+	FILTER("filter"), NAT("nat"), ROUTE("route");
+
+	private final String text;
+
+	private ChainType(final String text) {
+		this.text = text;
+	}
+
+	public String text() {
+		return this.text;
+	}
+
+	public static ChainType find(String text) {
+		for (ChainType family : values()) {
+			if (family.text()
+					.equals(text))
+				return family;
+		}
+		return null;
+	}
 
 }

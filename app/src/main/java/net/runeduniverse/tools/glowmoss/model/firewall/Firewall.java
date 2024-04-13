@@ -167,6 +167,58 @@ public class Firewall {
 
 	}
 
+	public Hook findHook(Family family, String name) {
+		switch (family) {
+		case NETDEV:
+			switch (name) {
+			case "ingress":
+				return hookIngress;
+			case "egress":
+				return hookEgress;
+			}
+			break;
+		case INET:
+		case IP:
+		case IP6:
+			switch (name) {
+			case "prerouting":
+				return ipHookPrerouting;
+			case "forward":
+				return ipHookForward;
+			case "input":
+				return ipHookInput;
+			case "output":
+				return ipHookOutput;
+			case "postrouting":
+				return ipHookPostrouting;
+			}
+			break;
+		case BRIDGE:
+			switch (name) {
+			case "prerouting":
+				return bridgeHookPrerouting;
+			case "forward":
+				return bridgeHookForward;
+			case "input":
+				return bridgeHookInput;
+			case "output":
+				return bridgeHookOutput;
+			case "postrouting":
+				return bridgeHookPostrouting;
+			}
+			break;
+		case ARP:
+			switch (name) {
+			case "input":
+				return arpHookInput;
+			case "output":
+				return arpHookOutput;
+			}
+			break;
+		}
+		return null;
+	}
+
 	protected static <T> T get(T obj, Supplier<T> supplier) {
 		if (obj == null)
 			return supplier.get();
