@@ -118,9 +118,10 @@ public class FirewallParser {
 				continue;
 
 			if (parseHeader) {
-				initFwChain(tmpTable, tmpChain, name, line);
 				parseHeader = false;
-				continue;
+				if (initFwChain(tmpTable.getTable()
+						.getFamily(), tmpChain, name, line))
+					continue;
 			}
 			rawRules.add(line);
 		}
@@ -131,8 +132,7 @@ public class FirewallParser {
 		return true;
 	}
 
-	protected void initFwChain(final TmpTable tempTable, final TmpChain tmpChain, final String name,
-			final String line) {
+	protected boolean initFwChain(final Family family, final TmpChain tmpChain, final String name, final String line) {
 		int state = 0;
 		String type = null;
 		String hook = null;
@@ -190,19 +190,21 @@ public class FirewallParser {
 			}
 		}
 		Chain chain;
+		boolean found = false;
 		if (type != null && hook != null && !priority.isEmpty()) {
 			// BaseChain
 			chain = new BaseChain().setType(ChainType.find(type))
-					.setHook(this.firewall.findHook(tempTable.getTable()
-							.getFamily(), hook))
+					.setHook(this.firewall.findHook(family, hook))
 					.setPriority(String.join(" ", priority))
 					.setPolicy(String.join(" ", policy));
+			found = true;
 		} else {
 			// Chain
 			chain = new Chain();
 		}
 		chain.setName(name);
 		tmpChain.setChain(chain);
+		return found;
 	}
 
 	protected boolean parseSet(final BufferedReader reader, final TmpTable tempTable, String name) throws IOException {

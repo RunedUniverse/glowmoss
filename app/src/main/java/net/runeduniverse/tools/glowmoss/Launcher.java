@@ -134,7 +134,7 @@ public class Launcher {
 
 		firewall.save(session);
 		// session.save(table, 20);
-		session.saveAll(parser.getResults(), 20);
+		session.saveAll(parser.getResults(), Integer.MAX_VALUE);
 	}
 
 	private static void initHost(Session session) {
