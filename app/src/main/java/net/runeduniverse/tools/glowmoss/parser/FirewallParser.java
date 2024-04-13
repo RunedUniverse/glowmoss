@@ -190,7 +190,7 @@ public class FirewallParser {
 			// BaseChain
 			chain = new BaseChain().setType(ChainType.find(type))
 					.setHook(this.firewall.findHook(tempTable.getTable()
-							.getFamily(), name))
+							.getFamily(), hook))
 					.setPriority(String.join(" ", priority))
 					.setPolicy(String.join(" ", policy));
 		} else {

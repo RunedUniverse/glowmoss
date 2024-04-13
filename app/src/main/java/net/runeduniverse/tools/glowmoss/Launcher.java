@@ -15,6 +15,9 @@
  */
 package net.runeduniverse.tools.glowmoss;
 
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
@@ -42,6 +45,7 @@ import net.runeduniverse.tools.glowmoss.model.network.Interface;
 import net.runeduniverse.tools.glowmoss.model.network.Namespace;
 import net.runeduniverse.tools.glowmoss.model.network.NetworkFactory;
 import net.runeduniverse.tools.glowmoss.model.server.Host;
+import net.runeduniverse.tools.glowmoss.parser.FirewallParser;
 
 public class Launcher {
 
@@ -97,26 +101,40 @@ public class Launcher {
 	}
 
 	private static void createFW(Session session) {
-		Firewall handler = Firewall.create();
+		Firewall firewall = Firewall.create();
 
-		Table table = new Table();
-		table.setFamily(Family.INET);
-		table.setName("basic-filter");
+		FirewallParser parser = new FirewallParser(firewall);
 
-		Chain netavarkInputChain = table.createChain("NETAVARK_INPUT", ChainType.FILTER);
-		Chain netavarkForwardChain = table.createChain("NETAVARK_FORWARD", ChainType.FILTER);
+		try {
+			parser.parse(
+					Paths.get("/data/userdata/code/java/RunedUniverse/glowmoss/src/main/resources", "ruleset.txt"));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 
-		table.createBaseChain("input-filter", ChainType.FILTER, handler.getIpHookInput(), 0)
-				.addRule(new Rule().setContent("ct state established,related accept"))
-				.addRule(new Rule().setContent("ip saddr 10.1.1.1 tcp dport ssh accept"))
-				.addRule(new Rule().setContent("ip saddr 10.88.0.0/16")
-						.setGoTo(netavarkInputChain));
-		table.createBaseChain("forward-filter", ChainType.FILTER, handler.getIpHookForward(), 0)
-				.addRule(new Rule().setContent("ip saddr 10.88.0.0./16")
-						.setJumpTo(netavarkForwardChain));
+		// Table table = new Table();
+		// table.setFamily(Family.INET);
+		// table.setName("basic-filter");
+		//
+		// Chain netavarkInputChain = table.createChain("NETAVARK_INPUT",
+		// ChainType.FILTER);
+		// Chain netavarkForwardChain = table.createChain("NETAVARK_FORWARD",
+		// ChainType.FILTER);
+		//
+		// table.createBaseChain("input-filter", ChainType.FILTER,
+		// firewall.getIpHookInput(), 0)
+		// .addRule(new Rule().setContent("ct state established,related accept"))
+		// .addRule(new Rule().setContent("ip saddr 10.1.1.1 tcp dport ssh accept"))
+		// .addRule(new Rule().setContent("ip saddr 10.88.0.0/16")
+		// .setGoTo(netavarkInputChain));
+		// table.createBaseChain("forward-filter", ChainType.FILTER,
+		// firewall.getIpHookForward(), 0)
+		// .addRule(new Rule().setContent("ip saddr 10.88.0.0./16")
+		// .setJumpTo(netavarkForwardChain));
 
-		handler.save(session);
-		session.save(table, 20);
+		firewall.save(session);
+		// session.save(table, 20);
+		session.saveAll(parser.getResults(), 20);
 	}
 
 	private static void initHost(Session session) {
