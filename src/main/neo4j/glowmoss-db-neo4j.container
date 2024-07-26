@@ -1,0 +1,30 @@
+# https://docs.podman.io/en/latest/markdown/podman-systemd.unit.5.html
+[Unit]
+Description=Glowmoss - Neo4j Database
+After=podman.service
+Requires=podman.service
+StartLimitBurst=3
+
+[Container]
+Image=docker.io/library/neo4j:4.4
+ContainerName=service-%N
+#User=
+#Group=
+PublishPort=7474:7474
+PublishPort=7687:7687
+Volume=/srv/glowmoss/neo4j/conf:/var/lib/neo4j/conf:Z
+Volume=/srv/glowmoss/neo4j/data:/data:Z
+Volume=/srv/glowmoss/neo4j/logs:/logs:Z
+Environment=NEO4J_AUTH=neo4j/glowmoss
+#IP=10.88.0.2
+
+[Service]
+LimitNOFILE=65536
+Restart=on-failure
+RestartSec=30
+#User=nexus
+#Group=nexus
+User=root
+
+[Install]
+WantedBy=multi-user.target
