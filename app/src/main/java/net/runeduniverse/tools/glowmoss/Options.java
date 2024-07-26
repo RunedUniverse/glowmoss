@@ -82,6 +82,7 @@ public class Options {
 					System.err.println("ERR: Invalid database port: " + val);
 					return false;
 				}
+				this.dbPort = p;
 				break;
 			case "--db-user":
 				if (!it.hasNext()) {
