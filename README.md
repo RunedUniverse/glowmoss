@@ -4,7 +4,7 @@ GlowMoss is a Linux system tool for analyzing NFTables rules and network routes
 ## Testing
 
 ```bash
-./test.sh --db-addr 127.0.01 --db-port 7687 --nft-ruleset $(pwd)/src/main/resources/ruleset.txt --log
+./test.sh --db-addr 127.0.0.1 --db-port 7687 --nft-ruleset $(pwd)/src/main/resources/ruleset.txt --log
 ```
 
 In the `src/main/neo4j` path contains an advanced database setup script.
