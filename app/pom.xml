@@ -39,6 +39,7 @@
 		<root-dir>..</root-dir>
 		<!-- VERSIONS -->
 		<artifact-version>0</artifact-version>
+		<release-version>0</release-version>
 		<sources-version>0</sources-version>
 		<api-version>0</api-version>
 	</properties>
@@ -158,7 +159,40 @@
 				<groupId>de.dentrassi.maven</groupId>
 				<artifactId>rpm</artifactId>
 				<configuration>
-					
+					<release>${release-version}</release>
+					<entries>
+						<!-- systemd generator service config -->
+						<entry>
+							<name>
+								/usr/bin/glowmoss
+							</name>
+							<file>src/main/resources/launch.sh</file>
+							<mode>0755</mode>
+						</entry>
+						<!-- app -->
+						<entry>
+							<name>/usr/lib/java/glowmoss/glowmoss-app-${major-version}.${minor-version}.${artifact-version}.jar</name>
+							<file>${project.build.directory}/glowmoss-app-${major-version}.${minor-version}.${artifact-version}.jar</file>
+						</entry>
+						<!-- libs -->
+						<entry>
+							<name>/usr/lib/java/glowmoss/lib</name>
+							<collect>
+								<from>${project.build.directory}/lib</from>
+							</collect>
+						</entry>
+					</entries>
+					<!-- scripts -->
+					<afterInstallation>
+						<script>ln -s /usr/lib/java/glowmoss/glowmoss-app-${major-version}.${minor-version}.${artifact-version}.jar /usr/lib/java/glowmoss-app.jar</script>
+					</afterInstallation>
+					<beforeRemoval>
+						<script>rm /usr/lib/java/glowmoss-app.jar</script>
+					</beforeRemoval>
+					<!-- requirements -->
+					<requires>
+						<require>java-1.8.0-openjdk ge 1.8.0</require>
+					</requires>
 				</configuration>
 			</plugin>
 		</plugins>
