@@ -154,6 +154,13 @@
 					</archive>
 				</configuration>
 			</plugin>
+			<plugin>
+				<groupId>de.dentrassi.maven</groupId>
+				<artifactId>rpm</artifactId>
+				<configuration>
+					
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
 </project>

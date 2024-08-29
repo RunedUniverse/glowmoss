@@ -17,7 +17,7 @@
 -->
 <project-execution-model
 	xmlns="https://api.runeduniverse.net/runes4tools/r4m-pem"
-	xsi:schemaLocation="https://api.runeduniverse.net/runes4tools/r4m-pem https://api.runeduniverse.net/runes4tools/r4m-pem-v1_0_0.xsd"
+	xsi:schemaLocation="https://api.runeduniverse.net/runes4tools/r4m-pem https://raw.githubusercontent.com/RunedUniverse/r4m-maven-extension/feature-15-advanced-phase-goal-order/model/src/main/resources/r4m-pem-v1_1_0.xsd"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 	<modelVersion>1.0.0</modelVersion>
 	<executions>
@@ -91,29 +91,6 @@
 								</goal>
 							</goals>
 						</phase>
-						<phase id="install">
-							<goals>
-								<goal id="install">
-									<groupId>org.apache.maven.plugins</groupId>
-									<artifactId>maven-install-plugin</artifactId>
-									<modes>
-										<default />
-										<dev />
-									</modes>
-								</goal>
-							</goals>
-						</phase>
-						<phase id="deploy">
-							<goals>
-								<goal id="deploy">
-									<groupId>org.apache.maven.plugins</groupId>
-									<artifactId>maven-deploy-plugin</artifactId>
-									<modes>
-										<deploy />
-									</modes>
-								</goal>
-							</goals>
-						</phase>
 					</phases>
 				</lifecycle>
 				<lifecycle id="site">
@@ -138,6 +115,44 @@
 									<modes>
 										<default />
 										<dev />
+									</modes>
+								</goal>
+							</goals>
+						</phase>
+					</phases>
+				</lifecycle>
+			</lifecycles>
+		</execution>
+		<execution source="override" id="default">
+			<restrictions>
+				<packaging-procedure>pom</packaging-procedure>
+				<packaging-procedure>jar</packaging-procedure>
+			</restrictions>
+			<triggers>
+				<default />
+			</triggers>
+			<lifecycles>
+				<lifecycle id="default">
+					<phases>
+						<phase id="install">
+							<goals>
+								<goal id="install">
+									<groupId>org.apache.maven.plugins</groupId>
+									<artifactId>maven-install-plugin</artifactId>
+									<modes>
+										<default />
+										<dev />
+									</modes>
+								</goal>
+							</goals>
+						</phase>
+						<phase id="deploy">
+							<goals>
+								<goal id="deploy">
+									<groupId>org.apache.maven.plugins</groupId>
+									<artifactId>maven-deploy-plugin</artifactId>
+									<modes>
+										<deploy />
 									</modes>
 								</goal>
 							</goals>
@@ -310,6 +325,15 @@
 									<groupId>org.apache.maven.plugins</groupId>
 									<artifactId>maven-javadoc-plugin</artifactId>
 								</goal>
+								<goal id="rpm" optional="true">
+									<groupId>de.dentrassi.maven</groupId>
+									<artifactId>rpm</artifactId>
+									<modes>
+										<default />
+										<dev />
+										<install />
+									</modes>
+								</goal>
 							</goals>
 						</phase>
 					</phases>
@@ -335,6 +359,34 @@
 									<artifactId>build-helper-maven-plugin</artifactId>
 									<modes>
 										<deploy-signed />
+									</modes>
+								</goal>
+							</goals>
+						</phase>
+					</phases>
+				</lifecycle>
+			</lifecycles>
+		</execution>
+		<!-- packaging-procedure: rpm -->
+		<execution source="override" id="default">
+			<restrictions>
+				<packaging-procedure>rpm</packaging-procedure>
+			</restrictions>
+			<triggers>
+				<default />
+			</triggers>
+			<lifecycles>
+				<lifecycle id="default">
+					<phases>
+						<phase id="package">
+							<goals>
+								<goal id="rpm">
+									<groupId>de.dentrassi.maven</groupId>
+									<artifactId>rpm</artifactId>
+									<modes>
+										<default />
+										<dev />
+										<install />
 									</modes>
 								</goal>
 							</goals>

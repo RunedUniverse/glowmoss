@@ -16,14 +16,11 @@ Volume=/srv/glowmoss/neo4j/conf:/var/lib/neo4j/conf:Z
 Volume=/srv/glowmoss/neo4j/data:/data:Z
 Volume=/srv/glowmoss/neo4j/logs:/logs:Z
 Environment=NEO4J_AUTH=neo4j/glowmoss
-#IP=10.88.0.2
 
 [Service]
 LimitNOFILE=65536
 Restart=on-failure
 RestartSec=30
-#User=nexus
-#Group=nexus
 User=root
 
 [Install]

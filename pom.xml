@@ -26,8 +26,8 @@
 	<packaging>pom</packaging>
 
 	<name>GlowMoss Parent</name>
-	<description>GlowMoss is an Linux system tool for analyzing iptables rules
-		and network routes </description>
+	<description>GlowMoss is a Linux system tool for analyzing NFTables rules
+		and network routes</description>
 	<url>https://github.com/VenaNocta/glowmoss</url>
 	<inceptionYear>2024</inceptionYear>
 
@@ -35,6 +35,7 @@
 		<module>sources</module>
 		<module>api</module>
 		<module>app</module>
+		<module>database</module>
 	</modules>
 
 	<licenses>
@@ -76,6 +77,7 @@
 		<java-source-version>1.8</java-source-version>
 		<java-target-version>${java-source-version}</java-target-version>
 		<root-dir>${basedir}</root-dir>
+		<rpm.skipSigning>true</rpm.skipSigning>
 		<!-- VERSIONS -->
 		<major-version>0</major-version>
 		<minor-version>0</minor-version>
@@ -95,6 +97,7 @@
 		<plugin-mycila-license-version>4.2.rc1</plugin-mycila-license-version>
 		<plugin-maven-gpg-version>3.0.1</plugin-maven-gpg-version>
 		<plugin-mojohaus-build-helper-version>3.2.0</plugin-mojohaus-build-helper-version>
+		<plugin-dentrassi-rpm-version>1.12.0</plugin-dentrassi-rpm-version>
 		<plugin-maven-deploy-version>3.0.0-M2</plugin-maven-deploy-version>
 	</properties>
 
@@ -103,6 +106,17 @@
 			<id>dev-install</id>
 			<build>
 				<defaultGoal>clean dev/install]</defaultGoal>
+				<pluginManagement>
+					<plugins>
+						<plugin>
+							<groupId>de.dentrassi.maven</groupId>
+							<artifactId>rpm</artifactId>
+							<configuration>
+								<targetDir>${root-dir}/target/yum/</targetDir>
+							</configuration>
+						</plugin>
+					</plugins>
+				</pluginManagement>
 			</build>
 		</profile>
 		<profile>
@@ -399,7 +413,6 @@
 									<exclude>.build/**</exclude>
 									<exclude>.mvn/**</exclude>
 									<exclude>.code-formats/**</exclude>
-									<exclude>**/resources/**</exclude>
 									<exclude>**/license/**</exclude>
 									<exclude>**/target/**</exclude>
 								</excludes>
@@ -444,6 +457,14 @@
 					<groupId>org.codehaus.mojo</groupId>
 					<artifactId>build-helper-maven-plugin</artifactId>
 					<version>${plugin-mojohaus-build-helper-version}</version>
+				</plugin>
+				<plugin>
+					<groupId>de.dentrassi.maven</groupId>
+					<artifactId>rpm</artifactId>
+					<version>${plugin-dentrassi-rpm-version}</version>
+					<configuration>
+						<attach>false</attach>
+					</configuration>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
