@@ -189,11 +189,8 @@
 					</entries>
 					<!-- scripts -->
 					<afterInstallation>
-						<script>ln -s /usr/lib/java/glowmoss/glowmoss-app-${major-version}.${minor-version}.${artifact-version}.jar /usr/lib/java/glowmoss-app.jar</script>
+						<script>ln -f -s /usr/lib/java/glowmoss/glowmoss-app-${major-version}.${minor-version}.${artifact-version}.jar /usr/lib/java/glowmoss-app.jar</script>
 					</afterInstallation>
-					<beforeRemoval>
-						<script>rm /usr/lib/java/glowmoss-app.jar</script>
-					</beforeRemoval>
 					<!-- requirements -->
 					<requires>
 						<require>java-1.8.0-openjdk ge 1.8.0</require>

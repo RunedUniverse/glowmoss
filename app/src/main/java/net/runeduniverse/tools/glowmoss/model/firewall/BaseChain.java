@@ -29,6 +29,7 @@ import static net.runeduniverse.tools.glowmoss.Util.*;
 
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.Map.Entry;
 
 @NodeEntity(label = "BASE_CHAIN")
 @Accessors(chain = true)
@@ -54,20 +55,20 @@ public class BaseChain extends Chain {
 
 	@Transient
 	protected final Object _priorityLock = new Object();
-	@Property(tag = "priority")
-	protected String _priority = "";
-	@Property(tag = "effPriority")
-	protected Integer _effPriority = 0;
+	@Property
+	protected String priority = "0";
+	@Property
+	protected Integer effPriority = 0;
 
 	public String getPriority() {
 		synchronized (this._priorityLock) {
-			return this._priority;
+			return this.priority;
 		}
 	}
 
 	public Integer getEffPriority() {
 		synchronized (this._priorityLock) {
-			return this._effPriority;
+			return this.effPriority;
 		}
 	}
 
@@ -82,15 +83,26 @@ public class BaseChain extends Chain {
 			if (!trySplitTerm(priority, splitTerm))
 				throw new NumberFormatException("invalid term");
 
-			final Map<String, Integer> varMap;
+			Map<String, Integer> varMap;
 			if (this.table == null)
 				varMap = Firewall.priorityMap(this.hook);
 			else
 				varMap = Firewall.priorityMap(this.table.getFamily(), this.hook);
-			final Integer p = calcSplitTermAsInteger(splitTerm, varMap);
 
-			this._priority = priority;
-			this._effPriority = p;
+			Integer p = null;
+			try {
+				p = calcSplitTermAsInteger(splitTerm, varMap);
+			} catch (NumberFormatException e) {
+				// frankly it seems that many nft rules dont adhere to the manpage restrictions!
+				varMap = Firewall.priorityMap(this.hook.getFamilies());
+				p = calcSplitTermAsInteger(splitTerm, varMap);
+				// log warning if it passed
+				System.out.println("WARN: invalid priority (variable) for hook »" + this.hook.getName()
+						+ "« discovered:\n      " + priority);
+			}
+
+			this.priority = priority;
+			this.effPriority = p;
 		}
 		return this;
 	}
@@ -99,8 +111,8 @@ public class BaseChain extends Chain {
 		synchronized (this._priorityLock) {
 			if (effPriority == null)
 				throw new NumberFormatException("null");
-			this._effPriority = effPriority;
-			this._priority = this._effPriority.toString();
+			this.effPriority = effPriority;
+			this.priority = this.effPriority.toString();
 		}
 		return this;
 	}

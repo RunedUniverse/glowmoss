@@ -18,6 +18,7 @@ package net.runeduniverse.tools.glowmoss.model.firewall;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 import lombok.Getter;
@@ -281,6 +282,18 @@ public class Firewall {
 	// │srcnat │ 300 │ postrouting │
 	// └───────┴───────┴─────────────┘
 
+	// frankly it seems that many nft rules dont adhere to the manpage restrictions!
+	public static Map<String, Integer> priorityMap(Family family) {
+		return priorityMap(family.text(), null);
+	}
+
+	public static Map<String, Integer> priorityMap(Set<Family> families) {
+		final Map<String, Integer> map = new LinkedHashMap<>();
+		for (Family family : families)
+			map.putAll(priorityMap(family.text(), null));
+		return map;
+	}
+
 	public static Map<String, Integer> priorityMap(Hook hook) {
 		final Map<String, Integer> map = new LinkedHashMap<>();
 		for (Family family : hook.getFamilies())
@@ -296,7 +309,7 @@ public class Firewall {
 		final Map<String, Integer> map = new LinkedHashMap<>();
 
 		// prerouting
-		if ("prerouting".equals(hook)) {
+		if (hook == null || "prerouting".equals(hook)) {
 			switch (family) {
 			case "ip":
 			case "ip6":
@@ -309,7 +322,7 @@ public class Firewall {
 			}
 		} else
 		// output
-		if ("output".equals(hook)) {
+		if (hook == null || "output".equals(hook)) {
 			switch (family) {
 			case "bridge":
 				map.put("out", 100);
@@ -317,7 +330,7 @@ public class Firewall {
 			}
 		} else
 		// postrouting
-		if ("postrouting".equals(hook)) {
+		if (hook == null || "postrouting".equals(hook)) {
 			switch (family) {
 			case "ip":
 			case "ip6":
