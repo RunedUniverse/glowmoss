@@ -28,22 +28,22 @@ import net.runeduniverse.tools.glowmoss.model.AEntity;
 @Accessors(chain = true)
 public class Rule extends AEntity {
 
-	private static final String REL_LABEL_JUMP = "JUMP";
-	private static final String REL_LABEL_GOTO = "GOTO";
+	public static final String REL_LABEL_JUMP = "JUMP";
+	public static final String REL_LABEL_GOTO = "GOTO";
 
 	@Setter(onMethod_ = { @Deprecated })
 	@Relationship(label = "NEXT", direction = Direction.OUTGOING)
-	private Rule next;
+	protected Rule _next;
 
 	@Setter
 	@Relationship(label = REL_LABEL_JUMP, direction = Direction.OUTGOING)
-	private Chain jumpTo = null;
+	protected Chain jumpTo = null;
 
 	@Setter
 	@Relationship(label = REL_LABEL_GOTO, direction = Direction.OUTGOING)
-	private Chain goTo = null;
+	protected Chain goTo = null;
 
 	@Setter
-	private String content;
+	protected String content;
 
 }

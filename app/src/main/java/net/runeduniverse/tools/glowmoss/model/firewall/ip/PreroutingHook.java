@@ -25,9 +25,11 @@ import net.runeduniverse.lib.rogm.annotations.Relationship;
 @Setter
 public class PreroutingHook extends IpHook {
 
-	protected static final String LABEL = "PREROUTING";
+	public static final String LABEL = "PREROUTING";
 
-	private String name = LABEL;
+	public PreroutingHook() {
+		super(LABEL);
+	}
 
 	@Relationship(label = "NEXT_IF_LOCAL")
 	public InputHook nextIfLocal;

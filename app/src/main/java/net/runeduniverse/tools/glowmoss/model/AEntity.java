@@ -24,7 +24,7 @@ public abstract class AEntity {
 
 	@Id
 	@GeneratedValue
-	private Long id;
+	protected Long id;
 
 	public Long getId() {
 		return this.id;

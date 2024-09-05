@@ -25,9 +25,11 @@ import net.runeduniverse.lib.rogm.annotations.Relationship;
 @Setter
 public class PreroutingBridgeHook extends BridgeHook {
 
-	protected static final String LABEL = "PREROUTING_BRIDGE";
+	public static final String LABEL = "PREROUTING_BRIDGE";
 
-	private String name = LABEL;
+	public PreroutingBridgeHook() {
+		super(LABEL);
+	}
 
 	@Relationship(label = "NEXT_IF_IP")
 	protected InputBridgeHook nextIfIp;

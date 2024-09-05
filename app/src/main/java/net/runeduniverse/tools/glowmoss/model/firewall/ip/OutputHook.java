@@ -25,9 +25,11 @@ import net.runeduniverse.lib.rogm.annotations.Relationship;
 @Setter
 public class OutputHook extends IpHook {
 
-	protected static final String LABEL = "OUTPUT";
+	public static final String LABEL = "OUTPUT";
 
-	private String name = LABEL;
+	public OutputHook() {
+		super(LABEL);
+	}
 
 	@Relationship(label = "NEXT")
 	protected PostroutingHook next;

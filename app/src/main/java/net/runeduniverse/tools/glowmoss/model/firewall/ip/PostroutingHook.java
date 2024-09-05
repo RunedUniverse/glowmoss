@@ -27,9 +27,11 @@ import net.runeduniverse.tools.glowmoss.model.firewall.bridge.OutputBridgeHook;
 @Setter
 public class PostroutingHook extends IpHook {
 
-	protected static final String LABEL = "POSTROUTING";
+	public static final String LABEL = "POSTROUTING";
 
-	private String name = LABEL;
+	public PostroutingHook() {
+		super(LABEL);
+	}
 
 	@Relationship(label = "NEXT_IF_BRIDGE_DEVICE")
 	protected OutputBridgeHook nextIfBridgeDevice;

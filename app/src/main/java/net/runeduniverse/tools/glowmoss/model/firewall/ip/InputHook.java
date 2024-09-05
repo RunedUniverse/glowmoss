@@ -26,9 +26,11 @@ import net.runeduniverse.tools.glowmoss.model.firewall.app.LocalProcess;
 @Setter
 public class InputHook extends IpHook {
 
-	protected static final String LABEL = "INPUT";
+	public static final String LABEL = "INPUT";
 
-	private String name = LABEL;
+	public InputHook() {
+		super(LABEL);
+	}
 
 	@Relationship(label = "NEXT")
 	protected LocalProcess next;

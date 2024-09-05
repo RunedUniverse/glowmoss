@@ -13,4 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.runeduniverse.tools.glowmoss.test;
+package net.runeduniverse.tools.glowmoss.model.firewall;
+
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import net.runeduniverse.tools.glowmoss.model.AEntity;
+
+@Getter
+@NoArgsConstructor
+public abstract class ANamedEntity extends AEntity {
+
+	protected String name = null;
+
+	public ANamedEntity(String name) {
+		this.name = name;
+	}
+}

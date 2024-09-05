@@ -23,12 +23,11 @@ import lombok.NoArgsConstructor;
 import net.runeduniverse.lib.rogm.annotations.Direction;
 import net.runeduniverse.lib.rogm.annotations.NodeEntity;
 import net.runeduniverse.lib.rogm.annotations.Relationship;
-import net.runeduniverse.tools.glowmoss.model.AEntity;
 
 @Getter
 @NoArgsConstructor
 @NodeEntity(label = "HOOK")
-public class Hook extends AEntity {
+public class Hook extends ANamedEntity {
 
 	private final Set<Family> families = new LinkedHashSet<>();
 
@@ -37,7 +36,8 @@ public class Hook extends AEntity {
 	@Relationship(label = BaseChain.REL_LABEL_HOOK, direction = Direction.OUTGOING)
 	private Set<BaseChain> chains = new LinkedHashSet<>();
 
-	protected Hook(Layer layer, Family... families) {
+	protected Hook(String name, Layer layer, Family... families) {
+		super(name);
 		this.layer = layer;
 		if (families == null)
 			return;
@@ -45,5 +45,4 @@ public class Hook extends AEntity {
 			this.families.add(family);
 		}
 	}
-
 }

@@ -22,7 +22,6 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 import net.runeduniverse.lib.rogm.annotations.NodeEntity;
 import net.runeduniverse.lib.rogm.annotations.Relationship;
-import net.runeduniverse.tools.glowmoss.model.AEntity;
 
 /*
  * Tables are containers for chains, sets and stateful objects. They are identified by their address family and
@@ -35,30 +34,32 @@ import net.runeduniverse.tools.glowmoss.model.AEntity;
 @Getter
 @NodeEntity(label = "TABLE")
 @Accessors(chain = true)
-public class Table extends AEntity {
+public class Table extends ANamedEntity {
 
 	// IP is default
 	public static final Family DEFAULT_FAMILY = Family.IP;
 
 	@Setter
-	private Family family = DEFAULT_FAMILY;
+	protected Family family = DEFAULT_FAMILY;
 
-	@Setter
-	private String name;
+	public Table setName(String name) {
+		this.name = name;
+		return this;
+	}
 
 	// flags
 	/*
 	 * table is not evaluated any more (base chains are unregistered).
 	 */
 	@Setter
-	private Boolean dormant = false;
+	protected Boolean dormant = false;
 
 	@Relationship(label = Chain.LABEL_REL_TABLE)
-	private List<Chain> chains = new LinkedList<>();
+	protected List<Chain> chains = new LinkedList<>();
 
-	private List<String> sets = new LinkedList<>();
+	protected List<String> sets = new LinkedList<>();
 
-	private List<String> statefulObjects = new LinkedList<>();
+	protected List<String> statefulObjects = new LinkedList<>();
 
 	public BaseChain createBaseChain(final String name, final ChainType type, final Hook hook, final Integer priority) {
 		final BaseChain chain = new BaseChain();
@@ -94,5 +95,4 @@ public class Table extends AEntity {
 		}
 		return this;
 	}
-
 }

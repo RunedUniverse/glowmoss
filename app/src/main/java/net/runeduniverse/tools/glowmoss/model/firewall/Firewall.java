@@ -16,6 +16,8 @@
 package net.runeduniverse.tools.glowmoss.model.firewall;
 
 import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 import lombok.Getter;
@@ -217,6 +219,136 @@ public class Firewall {
 			break;
 		}
 		return null;
+	}
+
+	public static String hookToText(Hook hook) {
+		if (hook instanceof IngressHook)
+			return "ingress";
+		if (hook instanceof EgressHook)
+			return "egress";
+		if (hook instanceof PreroutingHook || hook instanceof PreroutingBridgeHook)
+			return "prerouting";
+		if (hook instanceof ForwardHook || hook instanceof ForwardBridgeHook)
+			return "forward";
+		if (hook instanceof InputHook || hook instanceof InputBridgeHook || hook instanceof InputArpHook)
+			return "input";
+		if (hook instanceof OutputHook || hook instanceof OutputBridgeHook || hook instanceof OutputArpHook)
+			return "output";
+		if (hook instanceof PostroutingHook || hook instanceof PostroutingBridgeHook)
+			return "postrouting";
+		return null;
+	}
+
+	// Table 6. Standard priority names, family and hook compatibility matrix
+	// ┌─────────┬───────┬─────────────────────┬─────────────┐
+	// │Name │ Value │ Families │ Hooks │
+	// ├─────────┼───────┼─────────────────────┼─────────────┤
+	// │ │ │ │ │
+	// │raw │ -300 │ ip, ip6, inet │ all │
+	// ├─────────┼───────┼─────────────────────┼─────────────┤
+	// │ │ │ │ │
+	// │mangle │ -150 │ ip, ip6, inet │ all │
+	// ├─────────┼───────┼─────────────────────┼─────────────┤
+	// │ │ │ │ │
+	// │dstnat │ -100 │ ip, ip6, inet │ prerouting │
+	// ├─────────┼───────┼─────────────────────┼─────────────┤
+	// │ │ │ │ │
+	// │filter │ 0 │ ip, ip6, inet, arp, │ all │
+	// │ │ │ netdev │ │
+	// ├─────────┼───────┼─────────────────────┼─────────────┤
+	// │ │ │ │ │
+	// │security │ 50 │ ip, ip6, inet │ all │
+	// ├─────────┼───────┼─────────────────────┼─────────────┤
+	// │ │ │ │ │
+	// │srcnat │ 100 │ ip, ip6, inet │ postrouting │
+	// └─────────┴───────┴─────────────────────┴─────────────┘
+	//
+	// Table 7. Standard priority names and hook compatibility for the bridge family
+	// ┌───────┬───────┬─────────────┐
+	// │ │ │ │
+	// │Name │ Value │ Hooks │
+	// ├───────┼───────┼─────────────┤
+	// │ │ │ │
+	// │dstnat │ -300 │ prerouting │
+	// ├───────┼───────┼─────────────┤
+	// │ │ │ │
+	// │filter │ -200 │ all │
+	// ├───────┼───────┼─────────────┤
+	// │ │ │ │
+	// │out │ 100 │ output │
+	// ├───────┼───────┼─────────────┤
+	// │ │ │ │
+	// │srcnat │ 300 │ postrouting │
+	// └───────┴───────┴─────────────┘
+
+	public static Map<String, Integer> priorityMap(Hook hook) {
+		final Map<String, Integer> map = new LinkedHashMap<>();
+		for (Family family : hook.getFamilies())
+			map.putAll(priorityMap(family.text(), hookToText(hook)));
+		return map;
+	}
+
+	public static Map<String, Integer> priorityMap(Family family, Hook hook) {
+		return priorityMap(family.text(), hookToText(hook));
+	}
+
+	public static Map<String, Integer> priorityMap(String family, String hook) {
+		final Map<String, Integer> map = new LinkedHashMap<>();
+
+		// prerouting
+		if ("prerouting".equals(hook)) {
+			switch (family) {
+			case "ip":
+			case "ip6":
+			case "inet":
+				map.put("dstnat", -100);
+				break;
+			case "bridge":
+				map.put("dstnat", -300);
+				break;
+			}
+		} else
+		// output
+		if ("output".equals(hook)) {
+			switch (family) {
+			case "bridge":
+				map.put("out", 100);
+				break;
+			}
+		} else
+		// postrouting
+		if ("postrouting".equals(hook)) {
+			switch (family) {
+			case "ip":
+			case "ip6":
+			case "inet":
+				map.put("srcnat", 100);
+				break;
+			case "bridge":
+				map.put("srcnat", 300);
+				break;
+			}
+		}
+		// all
+		switch (family) {
+		case "ip":
+		case "ip6":
+		case "inet":
+			map.put("raw", -300);
+			map.put("mangle", -150);
+			map.put("security", 50);
+			map.put("filter", 0);
+			break;
+		case "arp":
+		case "netdev":
+			map.put("filter", 0);
+			break;
+		case "bridge":
+			map.put("filter", -200);
+			break;
+		}
+
+		return map;
 	}
 
 	protected static <T> T get(T obj, Supplier<T> supplier) {

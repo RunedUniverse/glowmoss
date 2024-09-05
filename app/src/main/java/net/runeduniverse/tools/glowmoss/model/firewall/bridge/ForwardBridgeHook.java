@@ -25,9 +25,11 @@ import net.runeduniverse.lib.rogm.annotations.Relationship;
 @Setter
 public class ForwardBridgeHook extends BridgeHook {
 
-	protected static final String LABEL = "FORWARD_BRIDGE";
+	public static final String LABEL = "FORWARD_BRIDGE";
 
-	private String name = LABEL;
+	public ForwardBridgeHook() {
+		super(LABEL);
+	}
 
 	@Relationship(label = "NEXT")
 	protected PostroutingBridgeHook next;

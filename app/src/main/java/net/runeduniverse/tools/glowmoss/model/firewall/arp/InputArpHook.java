@@ -25,9 +25,11 @@ import net.runeduniverse.lib.rogm.annotations.Relationship;
 @Setter
 public class InputArpHook extends ArpHook {
 
-	protected static final String LABEL = "INPUT_ARP";
+	public static final String LABEL = "INPUT_ARP";
 
-	private String name = LABEL;
+	public InputArpHook() {
+		super(LABEL);
+	}
 
 	@Relationship(label = "NEXT")
 	protected ArpHandler handler;

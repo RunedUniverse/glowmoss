@@ -26,12 +26,9 @@ public class EgressHook extends Hook {
 
 	protected static final String LABEL = "EGRESS";
 
-	private String name = LABEL;
-
 	// network device ?
 
 	public EgressHook() {
-		super(Layer.NONE, Family.NETDEV);
+		super(LABEL, Layer.NONE, Family.NETDEV);
 	}
-
 }

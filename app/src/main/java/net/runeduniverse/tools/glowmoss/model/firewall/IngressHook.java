@@ -30,8 +30,6 @@ public class IngressHook extends Hook {
 
 	protected static final String LABEL = "INGRESS";
 
-	private String name = LABEL;
-
 	// network device ?
 
 	@Relationship(label = "NEXT_IF_BRIDGE_PORT")
@@ -44,7 +42,6 @@ public class IngressHook extends Hook {
 	protected InputArpHook nextIfArpProtocol;
 
 	public IngressHook() {
-		super(Layer.NONE, Family.NETDEV);
+		super(LABEL, Layer.NONE, Family.NETDEV);
 	}
-
 }

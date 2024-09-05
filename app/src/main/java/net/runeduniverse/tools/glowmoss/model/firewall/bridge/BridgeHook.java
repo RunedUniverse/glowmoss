@@ -24,7 +24,11 @@ import net.runeduniverse.tools.glowmoss.model.firewall.Layer;
 public class BridgeHook extends Hook {
 
 	protected BridgeHook() {
-		super(Layer.BRIDGE, Family.BRIDGE);
+		super(null, Layer.BRIDGE, Family.BRIDGE);
+	}
+
+	protected BridgeHook(String name) {
+		super(name, Layer.BRIDGE, Family.BRIDGE);
 	}
 
 }

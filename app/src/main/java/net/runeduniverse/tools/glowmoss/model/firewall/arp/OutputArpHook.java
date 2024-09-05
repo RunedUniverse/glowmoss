@@ -26,9 +26,11 @@ import net.runeduniverse.tools.glowmoss.model.firewall.EgressHook;
 @Setter
 public class OutputArpHook extends ArpHook {
 
-	protected static final String LABEL = "OUTPUT_ARP";
+	public static final String LABEL = "OUTPUT_ARP";
 
-	private String name = LABEL;
+	public OutputArpHook() {
+		super(LABEL);
+	}
 
 	@Relationship(label = "NEXT")
 	protected EgressHook egress;

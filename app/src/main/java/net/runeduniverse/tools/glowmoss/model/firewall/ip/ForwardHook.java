@@ -25,11 +25,13 @@ import net.runeduniverse.lib.rogm.annotations.Relationship;
 @Setter
 public class ForwardHook extends IpHook {
 
-	protected static final String LABEL = "FORWARD";
+	public static final String LABEL = "FORWARD";
 
-	private String name = LABEL;
+	public ForwardHook() {
+		super(LABEL);
+	}
 
 	@Relationship(label = "NEXT")
-	public PostroutingHook next;
+	protected PostroutingHook next;
 
 }

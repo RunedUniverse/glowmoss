@@ -24,7 +24,10 @@ import net.runeduniverse.tools.glowmoss.model.firewall.Layer;
 public class IpHook extends Hook {
 
 	protected IpHook() {
-		super(Layer.IP, Family.INET, Family.IP, Family.IP6);
+		super(null, Layer.IP, Family.INET, Family.IP, Family.IP6);
 	}
 
+	protected IpHook(String name) {
+		super(name, Layer.IP, Family.INET, Family.IP, Family.IP6);
+	}
 }

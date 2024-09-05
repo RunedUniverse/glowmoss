@@ -27,7 +27,6 @@ import net.runeduniverse.lib.rogm.annotations.PostLoad;
 import net.runeduniverse.lib.rogm.annotations.PreSave;
 import net.runeduniverse.lib.rogm.annotations.Relationship;
 import net.runeduniverse.lib.rogm.annotations.Transient;
-import net.runeduniverse.tools.glowmoss.model.AEntity;
 
 /*
  * Chains are containers for rules. They exist in two kinds, base chains and regular chains. A base chain is an
@@ -36,25 +35,26 @@ import net.runeduniverse.tools.glowmoss.model.AEntity;
  */
 @NodeEntity(label = "CHAIN")
 @Accessors(chain = true)
-public class Chain extends AEntity {
+public class Chain extends ANamedEntity {
 
 	public static final String LABEL_REL_TABLE = "HAS_CHAIN";
 
 	@Relationship(label = LABEL_REL_TABLE, direction = Direction.INCOMING)
 	@Getter
 	@Setter
-	private Table table;
+	protected Table table;
 
-	@Getter
-	@Setter
-	private String name;
+	public Chain setName(String name) {
+		this.name = name;
+		return this;
+	}
 
 	@Relationship(label = "NEXT")
-	private Rule firstRule;
+	protected Rule _firstRule;
 
 	@Getter
 	@Transient
-	private List<Rule> rules = new LinkedList<>();
+	protected List<Rule> rules = new LinkedList<>();
 
 	public Chain addRule(Rule rule) {
 		this.rules.add(rule);
@@ -70,7 +70,7 @@ public class Chain extends AEntity {
 	private void postLoad() {
 		synchronized (this.rules) {
 			this.rules.clear();
-			for (Rule r = this.firstRule; r != null; r = r.getNext()) {
+			for (Rule r = this._firstRule; r != null; r = r.get_next()) {
 				this.rules.add(r);
 			}
 		}
@@ -83,13 +83,12 @@ public class Chain extends AEntity {
 			Rule last = null;
 			for (Rule rule : this.rules) {
 				if (last == null) {
-					this.firstRule = rule;
+					this._firstRule = rule;
 				} else {
-					last.setNext(rule);
+					last.set_next(rule);
 				}
 				last = rule;
 			}
 		}
 	}
-
 }

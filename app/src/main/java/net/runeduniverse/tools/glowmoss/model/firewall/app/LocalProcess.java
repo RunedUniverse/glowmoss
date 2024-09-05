@@ -28,12 +28,10 @@ import net.runeduniverse.tools.glowmoss.model.firewall.ip.OutputHook;
 @Setter
 public class LocalProcess extends AProcess {
 
-	protected static final String LABEL = "LOCAL_PROCESS";
-
-	private String name = LABEL;
+	public static final String LABEL = "LOCAL_PROCESS";
 
 	public LocalProcess() {
-		super(Layer.APPLICATION);
+		super(LABEL, Layer.APPLICATION);
 	}
 
 	@Relationship(label = "NEXT")

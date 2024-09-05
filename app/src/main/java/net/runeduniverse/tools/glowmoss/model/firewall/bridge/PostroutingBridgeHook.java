@@ -26,9 +26,11 @@ import net.runeduniverse.tools.glowmoss.model.firewall.EgressHook;
 @Setter
 public class PostroutingBridgeHook extends BridgeHook {
 
-	protected static final String LABEL = "POSTROUTING_BRIDGE";
+	public static final String LABEL = "POSTROUTING_BRIDGE";
 
-	private String name = LABEL;
+	public PostroutingBridgeHook() {
+		super(LABEL);
+	}
 
 	@Relationship(label = "NEXT")
 	protected EgressHook next;

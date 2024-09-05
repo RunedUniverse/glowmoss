@@ -20,11 +20,17 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 import net.runeduniverse.lib.rogm.annotations.Direction;
 import net.runeduniverse.lib.rogm.annotations.NodeEntity;
+import net.runeduniverse.lib.rogm.annotations.Property;
 import net.runeduniverse.lib.rogm.annotations.Relationship;
 import net.runeduniverse.lib.rogm.annotations.Transient;
 
+import static net.runeduniverse.lib.utils.common.StringUtils.isBlank;
+import static net.runeduniverse.tools.glowmoss.Util.*;
+
+import java.util.LinkedList;
+import java.util.Map;
+
 @NodeEntity(label = "BASE_CHAIN")
-@Getter
 @Accessors(chain = true)
 public class BaseChain extends Chain {
 
@@ -33,65 +39,78 @@ public class BaseChain extends Chain {
 	// default = 'filter'
 	@Getter
 	@Setter
-	private ChainType type = ChainType.FILTER;
+	protected ChainType type = ChainType.FILTER;
 
+	@Getter
 	@Setter
 	@Transient
 	@Relationship(label = REL_LABEL_HOOK, direction = Direction.INCOMING)
-	private Hook hook;
+	protected Hook hook;
 
+	@Getter
 	@Setter
 	// only on INGRESS & EGRESS
-	private String device = null;
+	protected String device = null;
 
-	// Table 6. Standard priority names, family and hook compatibility matrix
-	// ┌─────────┬───────┬─────────────────────┬─────────────┐
-	// │Name │ Value │ Families │ Hooks │
-	// ├─────────┼───────┼─────────────────────┼─────────────┤
-	// │ │ │ │ │
-	// │raw │ -300 │ ip, ip6, inet │ all │
-	// ├─────────┼───────┼─────────────────────┼─────────────┤
-	// │ │ │ │ │
-	// │mangle │ -150 │ ip, ip6, inet │ all │
-	// ├─────────┼───────┼─────────────────────┼─────────────┤
-	// │ │ │ │ │
-	// │dstnat │ -100 │ ip, ip6, inet │ prerouting │
-	// ├─────────┼───────┼─────────────────────┼─────────────┤
-	// │ │ │ │ │
-	// │filter │ 0 │ ip, ip6, inet, arp, │ all │
-	// │ │ │ netdev │ │
-	// ├─────────┼───────┼─────────────────────┼─────────────┤
-	// │ │ │ │ │
-	// │security │ 50 │ ip, ip6, inet │ all │
-	// ├─────────┼───────┼─────────────────────┼─────────────┤
-	// │ │ │ │ │
-	// │srcnat │ 100 │ ip, ip6, inet │ postrouting │
-	// └─────────┴───────┴─────────────────────┴─────────────┘
-	//
-	// Table 7. Standard priority names and hook compatibility for the bridge family
-	// ┌───────┬───────┬─────────────┐
-	// │ │ │ │
-	// │Name │ Value │ Hooks │
-	// ├───────┼───────┼─────────────┤
-	// │ │ │ │
-	// │dstnat │ -300 │ prerouting │
-	// ├───────┼───────┼─────────────┤
-	// │ │ │ │
-	// │filter │ -200 │ all │
-	// ├───────┼───────┼─────────────┤
-	// │ │ │ │
-	// │out │ 100 │ output │
-	// ├───────┼───────┼─────────────┤
-	// │ │ │ │
-	// │srcnat │ 300 │ postrouting │
-	// └───────┴───────┴─────────────┘
+	@Transient
+	protected final Object _priorityLock = new Object();
+	@Property(tag = "priority")
+	protected String _priority = "";
+	@Property(tag = "effPriority")
+	protected Integer _effPriority = 0;
+
+	public String getPriority() {
+		synchronized (this._priorityLock) {
+			return this._priority;
+		}
+	}
+
+	public Integer getEffPriority() {
+		synchronized (this._priorityLock) {
+			return this._effPriority;
+		}
+	}
+
+	public BaseChain setPriority(String priority) {
+		synchronized (this._priorityLock) {
+			if (isBlank(priority))
+				throw new NumberFormatException("null");
+
+			priority = priority.toLowerCase();
+
+			final LinkedList<String> splitTerm = new LinkedList<>();
+			if (!trySplitTerm(priority, splitTerm))
+				throw new NumberFormatException("invalid term");
+
+			final Map<String, Integer> varMap;
+			if (this.table == null)
+				varMap = Firewall.priorityMap(this.hook);
+			else
+				varMap = Firewall.priorityMap(this.table.getFamily(), this.hook);
+			final Integer p = calcSplitTermAsInteger(splitTerm, varMap);
+
+			this._priority = priority;
+			this._effPriority = p;
+		}
+		return this;
+	}
+
+	public BaseChain setEffPriority(Integer effPriority) {
+		synchronized (this._priorityLock) {
+			if (effPriority == null)
+				throw new NumberFormatException("null");
+			this._effPriority = effPriority;
+			this._priority = this._effPriority.toString();
+		}
+		return this;
+	}
+
+	protected void resetPriority() {
+		// when Bridge Family => -200 else => 0
+		setPriority("filter");
+	}
 
 	@Setter
-	private String priority = "";
-	@Setter
-	private Integer effPriority = 0;
-
-	@Setter
-	private String policy = null;
+	protected String policy = null;
 
 }

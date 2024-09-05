@@ -27,12 +27,10 @@ import net.runeduniverse.tools.glowmoss.model.firewall.Layer;
 @Setter
 public class ArpHandler extends AProcess {
 
-	protected static final String LABEL = "ARP_HANDLER";
-
-	private String name = LABEL;
+	public static final String LABEL = "ARP_HANDLER";
 
 	public ArpHandler() {
-		super(Layer.ARP);
+		super(LABEL, Layer.ARP);
 	}
 
 	@Relationship(label = "NEXT")

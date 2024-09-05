@@ -24,7 +24,10 @@ import net.runeduniverse.tools.glowmoss.model.firewall.Layer;
 public class ArpHook extends Hook {
 
 	protected ArpHook() {
-		super(Layer.ARP, Family.ARP);
+		super(null, Layer.ARP, Family.ARP);
 	}
 
+	protected ArpHook(String name) {
+		super(name, Layer.ARP, Family.ARP);
+	}
 }

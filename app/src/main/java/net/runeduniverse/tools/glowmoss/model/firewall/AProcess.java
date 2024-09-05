@@ -16,17 +16,14 @@
 package net.runeduniverse.tools.glowmoss.model.firewall;
 
 import lombok.Getter;
-import lombok.NoArgsConstructor;
-import net.runeduniverse.tools.glowmoss.model.AEntity;
 
 @Getter
-@NoArgsConstructor
-public class AProcess extends AEntity {
+public class AProcess extends ANamedEntity {
 
-	private Layer layer;
+	protected Layer layer;
 
-	protected AProcess(Layer layer) {
+	protected AProcess(String name, Layer layer) {
+		super(name);
 		this.layer = layer;
 	}
-
 }
