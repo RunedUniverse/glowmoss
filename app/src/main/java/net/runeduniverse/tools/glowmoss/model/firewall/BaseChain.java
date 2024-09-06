@@ -121,6 +121,7 @@ public class BaseChain extends Chain {
 		setPriority("filter");
 	}
 
+	@Getter
 	@Setter
 	protected String policy = null;
 

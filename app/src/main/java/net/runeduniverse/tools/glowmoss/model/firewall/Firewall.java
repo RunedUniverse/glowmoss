@@ -225,19 +225,37 @@ public class Firewall {
 	public static String hookToText(Hook hook) {
 		if (hook instanceof IngressHook)
 			return "ingress";
-		if (hook instanceof EgressHook)
-			return "egress";
 		if (hook instanceof PreroutingHook || hook instanceof PreroutingBridgeHook)
 			return "prerouting";
-		if (hook instanceof ForwardHook || hook instanceof ForwardBridgeHook)
-			return "forward";
 		if (hook instanceof InputHook || hook instanceof InputBridgeHook || hook instanceof InputArpHook)
 			return "input";
+		if (hook instanceof ForwardHook || hook instanceof ForwardBridgeHook)
+			return "forward";
 		if (hook instanceof OutputHook || hook instanceof OutputBridgeHook || hook instanceof OutputArpHook)
 			return "output";
 		if (hook instanceof PostroutingHook || hook instanceof PostroutingBridgeHook)
 			return "postrouting";
+		if (hook instanceof EgressHook)
+			return "egress";
 		return null;
+	}
+
+	public static Integer hookToSortIndex(Hook hook) {
+		if (hook instanceof IngressHook)
+			return 0;
+		if (hook instanceof PreroutingHook || hook instanceof PreroutingBridgeHook)
+			return 1;
+		if (hook instanceof InputHook || hook instanceof InputBridgeHook || hook instanceof InputArpHook)
+			return 2;
+		if (hook instanceof ForwardHook || hook instanceof ForwardBridgeHook)
+			return 3;
+		if (hook instanceof OutputHook || hook instanceof OutputBridgeHook || hook instanceof OutputArpHook)
+			return 4;
+		if (hook instanceof PostroutingHook || hook instanceof PostroutingBridgeHook)
+			return 5;
+		if (hook instanceof EgressHook)
+			return 6;
+		return -1;
 	}
 
 	// Table 6. Standard priority names, family and hook compatibility matrix
