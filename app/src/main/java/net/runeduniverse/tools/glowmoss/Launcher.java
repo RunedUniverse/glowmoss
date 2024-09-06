@@ -20,9 +20,9 @@ import java.util.ListIterator;
 import java.util.Set;
 import java.util.logging.Logger;
 
-import net.runeduniverse.tools.glowmoss.modes.ExecMode;
-import net.runeduniverse.tools.glowmoss.modes.FindMode;
-import net.runeduniverse.tools.glowmoss.modes.ImportMode;
+import net.runeduniverse.tools.glowmoss.modes.ExecModule;
+import net.runeduniverse.tools.glowmoss.modes.FirewallModule;
+import net.runeduniverse.tools.glowmoss.modes.ImportModule;
 import net.runeduniverse.tools.glowmoss.options.InvalidArgumentException;
 import net.runeduniverse.tools.glowmoss.options.MissingOptionException;
 import net.runeduniverse.tools.glowmoss.options.Options;
@@ -31,11 +31,11 @@ import static net.runeduniverse.tools.glowmoss.ArgUtils.collectArgs;
 
 public class Launcher {
 
-	private static final Set<ExecMode> loadedModes = new LinkedHashSet<>();
+	private static final Set<ExecModule> loadedModes = new LinkedHashSet<>();
 
 	private static ConsoleLogger logger = new ConsoleLogger(Logger.getLogger(Launcher.class.getName()));
 	private static Options options = new Options();
-	private static ExecMode mode = null;
+	private static ExecModule module = null;
 
 	public static void main(String[] args) {
 		RogmPatches.patch();
@@ -43,7 +43,8 @@ public class Launcher {
 		registerExecModes();
 
 		try {
-			init(args);
+			if (!init(args))
+				return;
 		} catch (InvalidArgumentException | MissingOptionException e) {
 			final String msg = e.getMessage();
 			if (msg != null)
@@ -52,19 +53,21 @@ public class Launcher {
 			return;
 		}
 
+		module.exec(logger, options);
 	}
 
 	private static void registerExecModes() {
-		loadedModes.add(new ImportMode());
-		loadedModes.add(new FindMode());
+		loadedModes.add(new ImportModule());
+		loadedModes.add(new FirewallModule());
 	}
 
 	public static boolean init(String[] argArr) throws InvalidArgumentException, MissingOptionException {
-		argLoop: for (ListIterator<String> it = collectArgs(argArr).listIterator(); it.hasNext();) {
-			if (mode == null) {
-				for (ExecMode execMode : loadedModes)
+		final ListIterator<String> it = collectArgs(argArr).listIterator();
+		argLoop: while (it.hasNext()) {
+			if (module == null) {
+				for (ExecModule execMode : loadedModes)
 					if (execMode.handle(it)) {
-						mode = execMode;
+						module = execMode;
 						continue argLoop;
 					}
 				break argLoop;
@@ -73,12 +76,34 @@ public class Launcher {
 			options.init(it);
 		}
 
-		if (mode == null)
-			throw new InvalidArgumentException("No Mode specified!");
+		if (module == null) {
+			// parse simple options
+			while (it.hasNext())
+				options.handle(it);
+			// handle call for help
+			if (options.help()) {
+				help();
+				return false;
+			}
+			// complain
+			throw new InvalidArgumentException("No Module specified!");
+		}
+
+		if (options.help()) {
+			module.help(logger, options);
+			return false;
+		}
 
 		// eval required args
-		mode.validate(logger, options);
+		module.validate(logger, options);
 		return true;
+	}
+
+	public static void help() {
+		System.out.println(">> Glowmoss");
+		System.out.println("    import --help");
+		System.out.println("    firewall < match > --help");
+		System.out.println();
 	}
 
 }

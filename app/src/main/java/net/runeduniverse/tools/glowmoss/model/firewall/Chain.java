@@ -16,8 +16,6 @@
 package net.runeduniverse.tools.glowmoss.model.firewall;
 
 import java.util.LinkedList;
-import java.util.List;
-
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
@@ -54,7 +52,7 @@ public class Chain extends ANamedEntity {
 
 	@Getter
 	@Transient
-	protected List<Rule> rules = new LinkedList<>();
+	protected LinkedList<Rule> rules = new LinkedList<>();
 
 	public Chain addRule(Rule rule) {
 		this.rules.add(rule);

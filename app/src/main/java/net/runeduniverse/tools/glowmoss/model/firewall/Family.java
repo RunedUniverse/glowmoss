@@ -32,7 +32,7 @@ public enum Family {
 	public static Family find(String text) {
 		for (Family family : values()) {
 			if (family.text()
-					.equals(text))
+					.equalsIgnoreCase(text))
 				return family;
 		}
 		return null;

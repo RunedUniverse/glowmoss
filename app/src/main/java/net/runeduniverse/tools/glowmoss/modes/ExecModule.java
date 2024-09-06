@@ -22,9 +22,11 @@ import net.runeduniverse.tools.glowmoss.options.InvalidArgumentException;
 import net.runeduniverse.tools.glowmoss.options.MissingOptionException;
 import net.runeduniverse.tools.glowmoss.options.Options;
 
-public interface ExecMode {
+public interface ExecModule {
 
 	public boolean handle(ListIterator<String> argPtr) throws InvalidArgumentException;
+
+	public void help(ConsoleLogger logger, Options options);
 
 	public void validate(ConsoleLogger logger, Options options) throws MissingOptionException;
 

@@ -44,7 +44,7 @@ import net.runeduniverse.tools.glowmoss.options.MissingOptionException;
 import net.runeduniverse.tools.glowmoss.options.Options;
 import net.runeduniverse.tools.glowmoss.parser.FirewallParser;
 
-public class ImportMode implements ExecMode {
+public class ImportModule implements ExecModule {
 
 	private Configuration dbCnf;
 	private QueryBuilder qryBuilder;
@@ -59,6 +59,13 @@ public class ImportMode implements ExecMode {
 		}
 		argPtr.previous();
 		return false;
+	}
+
+	@Override
+	public void help(ConsoleLogger logger, Options options) {
+		System.out.println(">> Glowmoss");
+		System.out.println("    import --db-addr <address> --nft-ruleset <path/to/ruleset> [...]");
+		System.out.println();
 	}
 
 	@Override
@@ -82,7 +89,7 @@ public class ImportMode implements ExecMode {
 
 			@Override
 			protected void setupChainManager(ChainManager chainManager) throws Exception {
-				chainManager.addChainLayers(ImportMode.class);
+				chainManager.addChainLayers(ImportModule.class);
 				RogmPatches.patch(chainManager);
 				super.setupChainManager(chainManager);
 			}

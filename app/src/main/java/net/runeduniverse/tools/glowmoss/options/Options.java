@@ -21,32 +21,35 @@ import lombok.Getter;
 import lombok.experimental.Accessors;
 
 @Accessors(fluent = true)
+@Getter
 public class Options {
 
 	// GENERAL
-	@Getter
 	private boolean log = false;
-	@Getter
 	private boolean debug = false;
+	private boolean help = false;
 
-	@Getter
 	private DBOptions dbOptions = new DBOptions();
-	@Getter
 	private NFTablesOptions nftOptions = new NFTablesOptions();
+	private MatchOptions matchOptions = new MatchOptions();
 
 	public void init(ListIterator<String> argPtr) throws InvalidArgumentException {
 		// if a handler detects sth skip the others!
-		if (handle(argPtr) || this.dbOptions.handle(argPtr) || this.nftOptions.handle(argPtr))
+		if (handle(argPtr) || this.dbOptions.handle(argPtr) || this.nftOptions.handle(argPtr)
+				|| this.matchOptions.handle(argPtr))
 			;
 	}
 
-	protected boolean handle(ListIterator<String> argPtr) {
+	public boolean handle(ListIterator<String> argPtr) {
 		switch (argPtr.next()) {
 		case "--log":
 			this.log = true;
 			return true;
 		case "--debug":
 			this.debug = true;
+			return true;
+		case "--help":
+			this.help = true;
 			return true;
 		}
 		// reset prt if no match was found!

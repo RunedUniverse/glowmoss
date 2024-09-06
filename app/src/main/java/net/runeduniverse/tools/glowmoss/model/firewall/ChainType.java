@@ -32,7 +32,7 @@ public enum ChainType {
 	public static ChainType find(String text) {
 		for (ChainType family : values()) {
 			if (family.text()
-					.equals(text))
+					.equalsIgnoreCase(text))
 				return family;
 		}
 		return null;

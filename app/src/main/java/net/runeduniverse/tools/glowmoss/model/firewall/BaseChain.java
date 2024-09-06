@@ -29,7 +29,6 @@ import static net.runeduniverse.tools.glowmoss.TermUtils.*;
 
 import java.util.LinkedList;
 import java.util.Map;
-import java.util.Map.Entry;
 
 @NodeEntity(label = "BASE_CHAIN")
 @Accessors(chain = true)

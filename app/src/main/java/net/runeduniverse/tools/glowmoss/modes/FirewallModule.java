@@ -17,27 +17,51 @@ package net.runeduniverse.tools.glowmoss.modes;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.LinkedHashSet;
 import java.util.ListIterator;
+import java.util.Set;
 
 import net.runeduniverse.tools.glowmoss.ConsoleLogger;
+import net.runeduniverse.tools.glowmoss.model.firewall.Chain;
 import net.runeduniverse.tools.glowmoss.model.firewall.Firewall;
+import net.runeduniverse.tools.glowmoss.model.firewall.Rule;
+import net.runeduniverse.tools.glowmoss.model.firewall.Table;
 import net.runeduniverse.tools.glowmoss.options.InvalidArgumentException;
+import net.runeduniverse.tools.glowmoss.options.MatchOptions;
 import net.runeduniverse.tools.glowmoss.options.MissingOptionException;
 import net.runeduniverse.tools.glowmoss.options.Options;
 import net.runeduniverse.tools.glowmoss.parser.FirewallParser;
 
-public class FindMode implements ExecMode {
+public class FirewallModule implements ExecModule {
 
 	private Options options;
+	private boolean modeMatch = false;
 
 	@Override
 	public boolean handle(ListIterator<String> argPtr) throws InvalidArgumentException {
 		switch (argPtr.next()) {
-		case "find":
-			return true;
+		case "firewall":
+			if (!argPtr.hasNext()) {
+				throw new InvalidArgumentException("Module is missing arguments! : [match|?]");
+			}
+
+			switch (argPtr.next()) {
+			case "match":
+				modeMatch = true;
+				return true;
+			}
+			// give another module the chance to load an extension
+			argPtr.previous();
 		}
 		argPtr.previous();
 		return false;
+	}
+
+	@Override
+	public void help(ConsoleLogger logger, Options options) {
+		System.out.println(">> Glowmoss");
+		System.out.println("    firewall match --nft-ruleset <path/to/ruleset> --match-* <value> [...]");
+		System.out.println();
 	}
 
 	@Override
@@ -48,22 +72,24 @@ public class FindMode implements ExecMode {
 
 	@Override
 	public boolean exec(ConsoleLogger logger, Options options) {
+		this.options = options;
 
-		final Firewall firewall = parseFW();
-		if (firewall == null) {
+		final Firewall firewall = Firewall.create();
+		final Set<Table> tables = parseFW(firewall);
+		if (tables == null) {
 			logger.info("Failed to parse Firewall!");
 			return false;
 		}
 
+		if (this.modeMatch)
+			execMatch(firewall, tables, this.options.matchOptions());
+
 		return true;
 	}
 
-	private Firewall parseFW() {
-		Firewall firewall = Firewall.create();
-
-		FirewallParser parser = new FirewallParser(firewall);
-
-		Path ruleset = options.nftOptions()
+	private Set<Table> parseFW(Firewall firewall) {
+		final FirewallParser parser = new FirewallParser(firewall);
+		final Path ruleset = this.options.nftOptions()
 				.ruleset();
 		if (ruleset == null)
 			return null;
@@ -75,7 +101,25 @@ public class FindMode implements ExecMode {
 			return null;
 		}
 
-		return firewall;
+		final Set<Table> tables = new LinkedHashSet<>();
+		tables.addAll(parser.getResults());
+		return tables;
+	}
+
+	private void execMatch(Firewall firewall, Set<Table> tables, MatchOptions options) {
+
+		for (Table table : tables) {
+
+			for (Chain chain : table.getChains()) {
+
+				for (Rule rule : chain.getRules()) {
+
+				}
+
+			}
+
+		}
+
 	}
 
 }
