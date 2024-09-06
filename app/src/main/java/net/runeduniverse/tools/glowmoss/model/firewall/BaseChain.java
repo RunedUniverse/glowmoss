@@ -25,7 +25,7 @@ import net.runeduniverse.lib.rogm.annotations.Relationship;
 import net.runeduniverse.lib.rogm.annotations.Transient;
 
 import static net.runeduniverse.lib.utils.common.StringUtils.isBlank;
-import static net.runeduniverse.tools.glowmoss.Util.*;
+import static net.runeduniverse.tools.glowmoss.TermUtils.*;
 
 import java.util.LinkedList;
 import java.util.Map;

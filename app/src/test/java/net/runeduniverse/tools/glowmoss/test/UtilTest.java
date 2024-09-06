@@ -26,7 +26,7 @@ import net.runeduniverse.tools.glowmoss.model.firewall.Firewall;
 import net.runeduniverse.tools.glowmoss.model.firewall.bridge.OutputBridgeHook;
 import net.runeduniverse.tools.glowmoss.model.firewall.ip.PreroutingHook;
 
-import static net.runeduniverse.tools.glowmoss.Util.*;
+import static net.runeduniverse.tools.glowmoss.TermUtils.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class UtilTest {

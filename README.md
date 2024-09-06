@@ -14,6 +14,6 @@ sudo systemctl start glowmoss-db.service
 The tool is executed via the launch script (`/usr/bin/glowmoss`) as shown in the example:
 
 ```bash
-glowmoss --db-addr 127.0.0.1 --db-port 7687 --nft-ruleset $(pwd)/src/main/resources/ruleset.txt --log
+glowmoss import --db-addr 127.0.0.1 --db-port 7687 --nft-ruleset $(pwd)/src/main/resources/ruleset.txt --log
 ```
 

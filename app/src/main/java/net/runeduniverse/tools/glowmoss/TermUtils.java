@@ -20,7 +20,7 @@ import static net.runeduniverse.lib.utils.common.StringUtils.isBlank;
 import java.util.List;
 import java.util.Map;
 
-public class Util {
+public class TermUtils {
 
 	public static boolean trySplitTerm(final String term, final List<String> result) {
 		String val = new String();

@@ -71,7 +71,7 @@ public class Firewall {
 	public Firewall() {
 	}
 
-	void init() {
+	protected void init() {
 		localProcess = new LocalProcess();
 
 		// Ip Layer
