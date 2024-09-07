@@ -143,14 +143,6 @@ public class FirewallModule implements ExecModule {
 			final Set<Rule> includedRules = fTable.getMatchedRules();
 			final LinkedList<Chain> selected = select(baseChainFilter, matchedRules, includedRules);
 
-			// for (Map.Entry<Integer, Map<Integer, BaseChain>> entry : tree.entrySet()) {
-			// for (BaseChain chain : entry.getValue()
-			// .values()) {
-			// if (hitBaseChains.contains(chain))
-			// printChain(chain, chain.getRules(), includedRules);
-			// }
-			// }
-
 			for (Chain chain : selected) {
 				printChain(chain, chain.getRules(), includedRules);
 			}
