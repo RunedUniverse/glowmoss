@@ -18,21 +18,15 @@ package net.runeduniverse.tools.glowmoss.modes;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
-
-import lombok.Getter;
 import net.runeduniverse.tools.glowmoss.ConsoleLogger;
 import net.runeduniverse.tools.glowmoss.model.firewall.BaseChain;
 import net.runeduniverse.tools.glowmoss.model.firewall.Chain;
-import net.runeduniverse.tools.glowmoss.model.firewall.ChainType;
 import net.runeduniverse.tools.glowmoss.model.firewall.EgressHook;
-import net.runeduniverse.tools.glowmoss.model.firewall.Family;
 import net.runeduniverse.tools.glowmoss.model.firewall.Firewall;
 import net.runeduniverse.tools.glowmoss.model.firewall.Hook;
 import net.runeduniverse.tools.glowmoss.model.firewall.IngressHook;
@@ -121,11 +115,6 @@ public class FirewallModule implements ExecModule {
 
 	private void execMatch(Firewall firewall, Set<Table> tables, MatchOptions options) {
 
-		final Set<String> matchRuleByRegex = options.matchRuleByRegex();
-		final Set<String> matchHookName = options.matchHookName();
-		final Set<ChainType> matchChainType = options.matchChainType();
-		final Set<Family> matchFamily = options.matchFamily();
-		final boolean hideDormantTables = !options.showDormantTables();
 		final boolean hideEmptyChains = options.hideEmptyChains();
 
 		for (Table table : tables) {
