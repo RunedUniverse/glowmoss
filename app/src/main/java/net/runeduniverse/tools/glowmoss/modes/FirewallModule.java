@@ -18,6 +18,7 @@ package net.runeduniverse.tools.glowmoss.modes;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.ListIterator;
@@ -141,7 +142,7 @@ public class FirewallModule implements ExecModule {
 			final Set<BaseChain> baseChainFilter = fTable.getMatchedBaseChains();
 			final Set<Rule> matchedRules = fTable.getMatchedRules();
 			final Set<Rule> includedRules = fTable.getMatchedRules();
-			final LinkedList<Chain> selected = select(baseChainFilter, matchedRules, includedRules);
+			final LinkedList<Chain> selected = select(baseChainFilter, matchedRules, includedRules, hideEmptyChains);
 
 			for (Chain chain : selected) {
 				printChain(chain, chain.getRules(), includedRules);
@@ -152,17 +153,80 @@ public class FirewallModule implements ExecModule {
 	}
 
 	protected LinkedList<Chain> select(final Set<BaseChain> baseChainFilter, final Set<Rule> matchedRules,
-			final Set<Rule> includedRules) {
+			final Set<Rule> includedRules, final boolean hideEmptyChains) {
+		final Set<Chain> excluded = new LinkedHashSet<>();
+		final LinkedList<Chain> result = new LinkedList<>();
+
 		final Set<Chain> chains = new LinkedHashSet<>();
 		for (Rule rule : matchedRules)
 			chains.add(rule.getChain());
 
-		final Set<Chain> excluded = new LinkedHashSet<>();
-		final LinkedList<Chain> result = new LinkedList<>();
+		final Set<Chain> valid = new LinkedHashSet<>();
+		final Set<Chain> flagged = new LinkedHashSet<>();
 
 		for (Chain chain : chains)
 			revSearch(baseChainFilter, excluded, result, includedRules, chain);
+		final Set<Chain> resultSet = new LinkedHashSet<>(result);
+		for (Chain chain : chains) {
+			if (fwdSearch(false, excluded, hideEmptyChains, resultSet, result, includedRules, chain))
+				valid.add(chain);
+			else
+				flagged.add(chain);
+		}
+
+		if (hideEmptyChains) {
+			for (Chain chain : flagged)
+				purgeResult(result, valid, chain);
+		}
+
 		return result;
+	}
+
+	protected boolean fwdSearch(final boolean checkContains, final Set<Chain> excluded, final boolean hideEmptyChains,
+			final Set<Chain> resultSet, final LinkedList<Chain> result, final Set<Rule> includedRules,
+			final Chain chain) {
+		if (chain == null || excluded.contains(chain))
+			return false;
+		if (checkContains && resultSet.contains(chain))
+			return true;
+
+		final LinkedList<Chain> tmpResult = new LinkedList<>();
+		final Set<Chain> tmpResultSet = new LinkedHashSet<>(resultSet);
+
+		boolean matched = false;
+		for (Rule rule : chain.getRules()) {
+			final LinkedList<Chain> partialResult = new LinkedList<>();
+			final Set<Chain> nextResultSet = new LinkedHashSet<>(tmpResultSet);
+
+			if (!rule.hasTargetRef()) {
+				matched = true;
+				includedRules.add(rule);
+				continue;
+			}
+
+			if (fwdSearch(true, excluded, hideEmptyChains, nextResultSet, partialResult, includedRules,
+					rule.getJumpTo()) || //
+					fwdSearch(true, excluded, hideEmptyChains, nextResultSet, partialResult, includedRules,
+							rule.getGoTo())) {
+				matched = true;
+				tmpResult.addAll(partialResult);
+				tmpResultSet.addAll(nextResultSet);
+				includedRules.add(rule);
+			}
+		}
+
+		if (matched) {
+			tmpResultSet.add(chain);
+		} else if (hideEmptyChains) {
+			excluded.add(chain);
+			return false;
+		}
+
+		if (checkContains)
+			tmpResult.addFirst(chain);
+		resultSet.addAll(tmpResultSet);
+		result.addAll(tmpResult);
+		return true;
 	}
 
 	protected boolean revSearch(final Set<BaseChain> baseChainFilter, final Set<Chain> excluded,
@@ -202,6 +266,33 @@ public class FirewallModule implements ExecModule {
 
 		excluded.add(chain);
 		return false;
+	}
+
+	protected void purgeResult(final LinkedList<Chain> result, final Set<Chain> valid, final Chain chain) {
+		if (chain == null || valid.contains(chain) || !result.contains(chain))
+			return;
+
+		for (Rule rule : chain.getRules()) {
+			Chain targetChain = rule.getJumpTo();
+			if (targetChain == null)
+				targetChain = rule.getGoTo();
+			if (targetChain == null)
+				continue;
+			// if the chain has a downstream valid chain it is also becomes valid
+			if (valid.contains(targetChain)) {
+				valid.add(chain);
+				return;
+			}
+		}
+
+		// purge chain
+		result.remove(chain);
+
+		// try to purge upstream chains
+		for (Rule rule : chain.getJumpSources())
+			purgeResult(result, valid, rule.getChain());
+		for (Rule rule : chain.getGotoSources())
+			purgeResult(result, valid, rule.getChain());
 	}
 
 	protected void printChain(final Chain chain, final Collection<Rule> rules, final Set<Rule> included) {

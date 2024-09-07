@@ -42,7 +42,7 @@ public class Rule extends AEntity {
 	@Getter
 	@Setter(onMethod_ = { @Deprecated })
 	@Relationship(label = "NEXT", direction = Direction.OUTGOING)
-	protected Rule _next;
+	protected Rule _next = null;
 
 	@Relationship(label = REL_LABEL_JUMP, direction = Direction.OUTGOING)
 	protected Chain _jumpTo = null;
@@ -51,6 +51,7 @@ public class Rule extends AEntity {
 		return this._jumpTo;
 	}
 
+	@SuppressWarnings("deprecation")
 	public Rule setJumpTo(Chain jumpTarget) {
 		if (jumpTarget == null) {
 			if (this._jumpTo != null)
@@ -71,6 +72,7 @@ public class Rule extends AEntity {
 		return this._goTo;
 	}
 
+	@SuppressWarnings("deprecation")
 	public Rule setGoTo(Chain gotoTarget) {
 		if (gotoTarget == null) {
 			if (this._goTo != null)
