@@ -145,7 +145,7 @@ public class FirewallModule implements ExecModule {
 			final LinkedList<Chain> selected = select(baseChainFilter, matchedRules, includedRules, hideEmptyChains);
 
 			for (Chain chain : selected) {
-				printChain(chain, chain.getRules(), includedRules);
+				printChain(chain, chain.getRules(), new LinkedHashSet<>(selected), includedRules);
 			}
 
 		}
@@ -295,7 +295,8 @@ public class FirewallModule implements ExecModule {
 			purgeResult(result, valid, rule.getChain());
 	}
 
-	protected void printChain(final Chain chain, final Collection<Rule> rules, final Set<Rule> included) {
+	protected void printChain(final Chain chain, final Collection<Rule> rules, final Set<Chain> includedChains,
+			final Set<Rule> includedRules) {
 		System.out.println("    Chain: " + chain.getName());
 
 		if (chain instanceof BaseChain) {
@@ -315,15 +316,37 @@ public class FirewallModule implements ExecModule {
 		}
 
 		boolean hadIncluded = false;
+		boolean skip = false;
+		String line = null;
 		for (Rule rule : rules) {
 			// only show generic hits before the selected rules
-			if (included.contains(rule)) {
+			if (includedRules.contains(rule)) {
 				hadIncluded = true;
 			} else if (hadIncluded) {
 				continue;
 			}
-			System.out.println("      | " + rule.getContent());
+			// has target?
+			Chain targetChain = rule.getJumpTo();
+			if (targetChain == null)
+				targetChain = rule.getGoTo();
+			if (targetChain == null)
+				skip = false;
+			else {
+				if (includedChains.contains(targetChain))
+					skip = false;
+				else {
+					if (skip)
+						continue;
+					skip = true;
+				}
+			}
+
+			if (line != null)
+				System.out.println(line);
+			line = skip ? "      ¦ <hidden>" : "      | " + rule.getContent();
 		}
+		if (!skip && line != null)
+			System.out.println(line);
 	}
 
 }
