@@ -34,6 +34,7 @@ public class MatchOptions {
 	private final Set<ChainType> matchChainType = new LinkedHashSet<>();
 	private final Set<Family> matchFamily = new LinkedHashSet<>();
 	private boolean showDormantTables = false;
+	private boolean hideEmptyChains = false;
 
 	public boolean handle(ListIterator<String> argPtr) throws InvalidArgumentException {
 		String val = null;
@@ -86,6 +87,9 @@ public class MatchOptions {
 
 		case "--show-dormant-tables":
 			this.showDormantTables = true;
+			return true;
+		case "--hide-empty-chains":
+			this.hideEmptyChains = true;
 			return true;
 
 		}

@@ -97,7 +97,7 @@ public class BaseChain extends Chain {
 				p = calcSplitTermAsInteger(splitTerm, varMap);
 				// log warning if it passed
 				System.out.println("WARN: invalid priority (variable) for hook »" + this.hook.getName()
-						+ "« discovered:\n      " + priority);
+						+ "« discovered: " + priority);
 			}
 
 			this.priority = priority;

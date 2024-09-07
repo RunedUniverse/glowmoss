@@ -15,7 +15,10 @@
  */
 package net.runeduniverse.tools.glowmoss.model.firewall;
 
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
+import java.util.Set;
+
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
@@ -42,6 +45,22 @@ public class Chain extends ANamedEntity {
 	@Setter
 	protected Table table;
 
+	@Relationship(label = Rule.REL_LABEL_JUMP, direction = Direction.INCOMING)
+	@Getter(onMethod_ = { @Deprecated })
+	protected final Set<Rule> _jumpSources = new LinkedHashSet<>();
+
+	public Set<Rule> getJumpSources() {
+		return new LinkedHashSet<Rule>(this._jumpSources);
+	}
+
+	@Relationship(label = Rule.REL_LABEL_GOTO, direction = Direction.INCOMING)
+	@Getter(onMethod_ = { @Deprecated })
+	protected final Set<Rule> _gotoSources = new LinkedHashSet<>();
+
+	public Set<Rule> getGotoSources() {
+		return new LinkedHashSet<Rule>(this._gotoSources);
+	}
+
 	public Chain setName(String name) {
 		this.name = name;
 		return this;
@@ -50,26 +69,35 @@ public class Chain extends ANamedEntity {
 	@Relationship(label = "NEXT")
 	protected Rule _firstRule;
 
-	@Getter
 	@Transient
-	protected LinkedList<Rule> rules = new LinkedList<>();
+	protected LinkedList<Rule> _rules = new LinkedList<>();
 
+	public LinkedList<Rule> getRules() {
+		return new LinkedList<Rule>(this._rules);
+	}
+
+	@SuppressWarnings("deprecation")
 	public Chain addRule(Rule rule) {
-		this.rules.add(rule);
+		this._rules.add(rule);
+		rule.set_chain(this);
 		return this;
 	}
 
+	@SuppressWarnings("deprecation")
 	public Chain removeRule(Rule rule) {
-		this.rules.remove(rule);
+		this._rules.remove(rule);
+		rule.set_chain(null);
 		return this;
 	}
 
+	@SuppressWarnings("deprecation")
 	@PostLoad
 	private void postLoad() {
-		synchronized (this.rules) {
-			this.rules.clear();
+		synchronized (this._rules) {
+			this._rules.clear();
 			for (Rule r = this._firstRule; r != null; r = r.get_next()) {
-				this.rules.add(r);
+				this._rules.add(r);
+				r.set_chain(this);
 			}
 		}
 	}
@@ -77,9 +105,9 @@ public class Chain extends ANamedEntity {
 	@PreSave
 	@SuppressWarnings("deprecation")
 	private void preSave() {
-		synchronized (this.rules) {
+		synchronized (this._rules) {
 			Rule last = null;
-			for (Rule rule : this.rules) {
+			for (Rule rule : this._rules) {
 				if (last == null) {
 					this._firstRule = rule;
 				} else {
