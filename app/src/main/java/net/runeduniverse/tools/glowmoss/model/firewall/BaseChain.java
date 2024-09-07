@@ -96,7 +96,7 @@ public class BaseChain extends Chain {
 				varMap = Firewall.priorityMap(this.hook.getFamilies());
 				p = calcSplitTermAsInteger(splitTerm, varMap);
 				// log warning if it passed
-				System.out.println("WARN: invalid priority (variable) for hook »" + this.hook.getName()
+				System.out.println("WARN: unusual priority (variable) for hook »" + this.hook.getName()
 						+ "« discovered: " + priority);
 			}
 

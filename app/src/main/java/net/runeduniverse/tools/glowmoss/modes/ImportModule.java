@@ -41,6 +41,7 @@ import net.runeduniverse.tools.glowmoss.model.network.Namespace;
 import net.runeduniverse.tools.glowmoss.model.network.NetworkFactory;
 import net.runeduniverse.tools.glowmoss.model.server.Host;
 import net.runeduniverse.tools.glowmoss.options.MissingOptionException;
+import net.runeduniverse.tools.glowmoss.options.NFTablesOptions;
 import net.runeduniverse.tools.glowmoss.options.Options;
 import net.runeduniverse.tools.glowmoss.parser.FirewallParser;
 
@@ -49,7 +50,7 @@ public class ImportModule implements ExecModule {
 	private Configuration dbCnf;
 	private QueryBuilder qryBuilder;
 
-	private Options options;
+	private static boolean log;
 
 	@Override
 	public boolean handle(ListIterator<String> argPtr) {
@@ -78,6 +79,8 @@ public class ImportModule implements ExecModule {
 
 	@Override
 	public boolean exec(ConsoleLogger logger, Options options) {
+		ImportModule.log = options.log();
+
 		dbCnf = options.dbOptions()
 				.dbConfig();
 
@@ -100,7 +103,7 @@ public class ImportModule implements ExecModule {
 			qryBuilder = dbSession.getQueryBuilder();
 
 			// initHost(dbSession);
-			createFW(dbSession);
+			createFW(options.nftOptions(), dbSession);
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -109,21 +112,20 @@ public class ImportModule implements ExecModule {
 	}
 
 	@net.runeduniverse.lib.utils.chain.Chain(label = Chains.SAVE_CHAIN.ONE.LABEL, layers = { 199 })
-	public void debug(IMapper mapper) {
-		if (!options.log())
+	public static void debug(IMapper mapper) {
+		if (!log)
 			return;
 		System.err.println();
 		System.err.println();
 		System.err.println(mapper.qry());
 	}
 
-	private void createFW(Session session) {
+	private void createFW(NFTablesOptions options, Session session) {
 		Firewall firewall = Firewall.create();
 
 		FirewallParser parser = new FirewallParser(firewall);
 
-		Path ruleset = options.nftOptions()
-				.ruleset();
+		Path ruleset = options.ruleset();
 		if (ruleset == null)
 			return;
 
