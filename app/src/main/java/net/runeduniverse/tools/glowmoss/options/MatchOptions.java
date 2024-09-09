@@ -35,6 +35,7 @@ public class MatchOptions {
 	private final Set<Family> matchFamily = new LinkedHashSet<>();
 	private boolean showDormantTables = false;
 	private boolean hideEmptyChains = false;
+	private boolean ignoreIpv6Rules = false;
 
 	public boolean handle(ListIterator<String> argPtr) throws InvalidArgumentException {
 		String val = null;
@@ -90,6 +91,9 @@ public class MatchOptions {
 			return true;
 		case "--hide-empty-chains":
 			this.hideEmptyChains = true;
+			return true;
+		case "--ignore-ipv6-rules":
+			this.ignoreIpv6Rules = true;
 			return true;
 
 		}

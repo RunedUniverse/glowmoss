@@ -44,6 +44,9 @@ public class FirewallModule implements ExecModule {
 	private Options options;
 	private boolean modeMatch = false;
 
+	private final Set<Rule> hiddenRules = new LinkedHashSet<>();
+	private final Set<Chain> chainsWithHiddenRules = new LinkedHashSet<>();
+
 	@Override
 	public boolean handle(ListIterator<String> argPtr) throws InvalidArgumentException {
 		switch (argPtr.next()) {
@@ -78,6 +81,7 @@ public class FirewallModule implements ExecModule {
 			System.out.println("        --match-family        <type>");
 			System.out.println("        --show-dormant-tables");
 			System.out.println("        --hide-empty-chains");
+			System.out.println("        --ignore-ipv6-rules");
 		} else {
 			System.out.println("    firewall <mode>");
 			System.out.println("      modes:");
@@ -166,8 +170,10 @@ public class FirewallModule implements ExecModule {
 		final LinkedList<Chain> result = new LinkedList<>();
 
 		final Set<Chain> chains = new LinkedHashSet<>();
-		for (Rule rule : matchedRules)
-			chains.add(rule.getChain());
+		for (Rule rule : matchedRules) {
+			if (keepRuleCheck(rule))
+				chains.add(rule.getChain());
+		}
 
 		final Set<Chain> valid = new LinkedHashSet<>();
 		final Set<Chain> flagged = new LinkedHashSet<>();
@@ -190,6 +196,20 @@ public class FirewallModule implements ExecModule {
 		return result;
 	}
 
+	protected boolean keepRuleCheck(final Rule rule) {
+		if (this.hiddenRules.contains(rule))
+			return false;
+
+		final String content = rule.getContent();
+		final MatchOptions options = this.options.matchOptions();
+
+		if (!(options.ignoreIpv6Rules() && (content.startsWith("ip6") || content.startsWith("icmpv6"))))
+			return true;
+
+		this.hiddenRules.add(rule);
+		return false;
+	}
+
 	protected boolean fwdSearch(final boolean checkContains, final Set<Chain> excluded, final boolean hideEmptyChains,
 			final Set<Chain> resultSet, final LinkedList<Chain> result, final Set<Rule> includedRules,
 			final Chain chain) {
@@ -205,6 +225,11 @@ public class FirewallModule implements ExecModule {
 		for (Rule rule : chain.getRules()) {
 			final LinkedList<Chain> partialResult = new LinkedList<>();
 			final Set<Chain> nextResultSet = new LinkedHashSet<>(tmpResultSet);
+
+			if (!keepRuleCheck(rule)) {
+				this.chainsWithHiddenRules.add(chain);
+				continue;
+			}
 
 			if (!rule.hasTargetRef()) {
 				matched = true;
@@ -255,17 +280,27 @@ public class FirewallModule implements ExecModule {
 		}
 
 		boolean matched = false;
-		for (Rule rule : chain.getJumpSources())
-			if (revSearch(baseChainFilter, excluded, result, includedRules, rule.getChain())) {
-				matched = true;
-				includedRules.add(rule);
-			}
-		if (!matched)
-			for (Rule rule : chain.getGotoSources())
+		for (Rule rule : chain.getJumpSources()) {
+			if (keepRuleCheck(rule)) {
 				if (revSearch(baseChainFilter, excluded, result, includedRules, rule.getChain())) {
 					matched = true;
 					includedRules.add(rule);
 				}
+			} else {
+				this.chainsWithHiddenRules.add(rule.getChain());
+			}
+		}
+		if (!matched) {
+			for (Rule rule : chain.getGotoSources())
+				if (keepRuleCheck(rule)) {
+					if (revSearch(baseChainFilter, excluded, result, includedRules, rule.getChain())) {
+						matched = true;
+						includedRules.add(rule);
+					}
+				} else {
+					this.chainsWithHiddenRules.add(rule.getChain());
+				}
+		}
 
 		if (matched) {
 			result.add(chain);
@@ -333,20 +368,27 @@ public class FirewallModule implements ExecModule {
 			} else if (hadIncluded) {
 				continue;
 			}
-			// has target?
-			Chain targetChain = rule.getJumpTo();
-			if (targetChain == null)
-				targetChain = rule.getGoTo();
-			if (targetChain == null)
-				skip = false;
-			else {
-				if (includedChains.contains(targetChain))
+
+			if (keepRuleCheck(rule)) {
+				// has target?
+				Chain targetChain = rule.getJumpTo();
+				if (targetChain == null)
+					targetChain = rule.getGoTo();
+				if (targetChain == null) {
 					skip = false;
-				else {
-					if (skip)
-						continue;
-					skip = true;
+				} else {
+					if (includedChains.contains(targetChain))
+						skip = false;
+					else {
+						if (skip)
+							continue;
+						skip = true;
+					}
 				}
+
+			} else {
+				// rule => ignored
+				skip = true;
 			}
 
 			if (line != null)
@@ -355,6 +397,12 @@ public class FirewallModule implements ExecModule {
 		}
 		if (!skip && line != null)
 			System.out.println(line);
+	}
+
+	@FunctionalInterface
+	protected static interface RuleFilter {
+
+		public boolean check(final Rule rule);
 	}
 
 }
