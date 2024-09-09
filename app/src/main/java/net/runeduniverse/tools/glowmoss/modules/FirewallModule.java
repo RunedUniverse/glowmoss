@@ -18,12 +18,17 @@ package net.runeduniverse.tools.glowmoss.modules;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Collection;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import net.runeduniverse.tools.glowmoss.ConsoleLogger;
+import net.runeduniverse.tools.glowmoss.filter.IgnoreFilter;
 import net.runeduniverse.tools.glowmoss.model.firewall.BaseChain;
 import net.runeduniverse.tools.glowmoss.model.firewall.Chain;
 import net.runeduniverse.tools.glowmoss.model.firewall.EgressHook;
@@ -46,6 +51,7 @@ public class FirewallModule implements ExecModule {
 
 	private final Set<Rule> ignoredRules = new LinkedHashSet<>();
 	private final Set<Chain> chainsWithIgnoredRules = new LinkedHashSet<>();
+	private final Map<Chain, String> simpleResults = new LinkedHashMap<>();
 
 	@Override
 	public boolean handle(ListIterator<String> argPtr) throws InvalidArgumentException {
@@ -161,7 +167,6 @@ public class FirewallModule implements ExecModule {
 			}
 
 		}
-
 	}
 
 	protected LinkedList<Chain> select(final Set<BaseChain> baseChainFilter, final Set<Rule> matchedRules,
@@ -182,7 +187,8 @@ public class FirewallModule implements ExecModule {
 			revSearch(baseChainFilter, excluded, result, includedRules, chain);
 		final Set<Chain> resultSet = new LinkedHashSet<>(result);
 		for (Chain chain : chains) {
-			if (fwdSearch(false, excluded, hideEmptyChains, resultSet, result, includedRules, chain))
+			if (fwdSearch(false, excluded, hideEmptyChains, resultSet, result, includedRules, chain,
+					false/* checkGotoSouce(result, chain.getGotoSources()) */))
 				valid.add(chain);
 			else
 				flagged.add(chain);
@@ -191,28 +197,28 @@ public class FirewallModule implements ExecModule {
 		if (hideEmptyChains) {
 			for (Chain chain : flagged)
 				purgeResult(result, valid, chain);
+			// truncate simple results!
+			for (Iterator<Chain> i = result.iterator(); i.hasNext();) {
+				if (this.simpleResults.get(i.next()) != null)
+					i.remove();
+			}
 		}
 
 		return result;
 	}
 
-	protected boolean keepRuleCheck(final Rule rule) {
-		if (this.ignoredRules.contains(rule))
-			return false;
-
-		final String content = rule.getContent();
-		final MatchOptions options = this.options.matchOptions();
-
-		if (!(options.ignoreIpv6Rules() && (content.startsWith("ip6") || content.startsWith("icmpv6"))))
-			return true;
-
-		this.ignoredRules.add(rule);
+	protected boolean checkGotoSouce(Collection<Chain> base, Collection<Rule> checks) {
+		final Set<Chain> baseSet = new LinkedHashSet<>(base);
+		for (Rule rule : checks) {
+			if (baseSet.contains(rule.getChain()))
+				return true;
+		}
 		return false;
 	}
 
 	protected boolean fwdSearch(final boolean checkContains, final Set<Chain> excluded, final boolean hideEmptyChains,
 			final Set<Chain> resultSet, final LinkedList<Chain> result, final Set<Rule> includedRules,
-			final Chain chain) {
+			final Chain chain, final boolean isGoto) {
 		if (chain == null || excluded.contains(chain))
 			return false;
 		if (checkContains && resultSet.contains(chain))
@@ -221,6 +227,7 @@ public class FirewallModule implements ExecModule {
 		final LinkedList<Chain> tmpResult = new LinkedList<>();
 		final Set<Chain> tmpResultSet = new LinkedHashSet<>(resultSet);
 
+		// since gotos do not return they always match!
 		boolean matched = false;
 		for (Rule rule : chain.getRules()) {
 			final LinkedList<Chain> partialResult = new LinkedList<>();
@@ -237,16 +244,25 @@ public class FirewallModule implements ExecModule {
 				continue;
 			}
 
-			if (fwdSearch(true, excluded, hideEmptyChains, nextResultSet, partialResult, includedRules,
-					rule.getJumpTo()) || //
-					fwdSearch(true, excluded, hideEmptyChains, nextResultSet, partialResult, includedRules,
-							rule.getGoTo())) {
+			boolean jumpMatch = fwdSearch(true, excluded, hideEmptyChains, nextResultSet, partialResult, includedRules,
+					rule.getJumpTo(), false);
+
+			final Chain gotoTarget = rule.getGoTo();
+			boolean gotoMatch = false;
+			if (gotoTarget != null) {
+				gotoMatch = fwdSearch(true, excluded, hideEmptyChains, nextResultSet, partialResult, includedRules,
+						gotoTarget, true);
+			}
+
+			if (jumpMatch || gotoMatch) {
 				matched = true;
 				tmpResult.addAll(partialResult);
 				tmpResultSet.addAll(nextResultSet);
 				includedRules.add(rule);
 			}
 		}
+
+		computeSimpleResult(resultSet, chain, this::ignoreRuleCheck);
 
 		if (matched) {
 			tmpResultSet.add(chain);
@@ -361,6 +377,7 @@ public class FirewallModule implements ExecModule {
 		boolean hadIncluded = false;
 		boolean skip = false;
 		String line = null;
+		String note = null;
 		for (Rule rule : rules) {
 			// only show generic hits before the selected rules
 			if (includedRules.contains(rule)) {
@@ -380,6 +397,10 @@ public class FirewallModule implements ExecModule {
 					if (includedChains.contains(targetChain))
 						skip = false;
 					else {
+						if ((note = this.simpleResults.get(targetChain)) != null) {
+							skip = false;
+						}
+
 						if (skip)
 							continue;
 						skip = true;
@@ -391,18 +412,110 @@ public class FirewallModule implements ExecModule {
 				skip = true;
 			}
 
-			if (line != null)
+			if (line != null) {
 				System.out.println(line);
+				if (note != null) {
+					System.out.println("      | >> " + note);
+					note = null;
+				}
+			}
 			line = skip ? "      ¦ <hidden>" : "      | " + rule.getContent();
 		}
-		if (!skip && line != null)
+		if (!skip && line != null) {
 			System.out.println(line);
+			if (note != null)
+				System.out.println("        >> " + note);
+		}
 	}
 
-	@FunctionalInterface
-	protected static interface RuleFilter {
+	protected void computeSimpleResult(final Set<Chain> selection, final Chain chain, final IgnoreFilter<Rule> filter) {
+		final Iterator<Rule> i = chain.getRules()
+				.iterator();
+		String content = null;
+		while (i.hasNext()) {
+			final Rule rule = (Rule) i.next();
+			if (filter.checkIgnore(rule))
+				continue;
 
-		public boolean check(final Rule rule);
+			content = rule.getContent();
+
+			final Chain jumpTarget = rule.getJumpTo();
+			final Chain gotoTarget = rule.getGoTo();
+
+			if (jumpTarget != null && content.startsWith("jump")) {
+				content = this.simpleResults.get(jumpTarget);
+				break;
+			}
+			if (gotoTarget != null && content.startsWith("goto")) {
+				System.err.println("22222        " + content);
+				content = this.simpleResults.get(gotoTarget);
+				System.err.println("simple       " + content);
+				if (content == null)
+					content = getPolicyNote(selection, chain);
+				System.err.println("simple + pol " + content);
+				break;
+			}
+			if (content.startsWith("accept") || content.startsWith("drop") || content.startsWith("reject")) {
+				break;
+			}
+			content = null;
+			break;
+		}
+		// check for another rule, if the matched rule isn't last something is off!
+		// => log everything!
+		this.simpleResults.put(chain, i.hasNext() ? null : content);
+	}
+
+	protected String getPolicyNote(final Set<Chain> selection, final Chain chain) {
+		final Set<BaseChain> roots = new LinkedHashSet<>();
+		collectRoots(roots, new LinkedHashSet<>(), selection, chain);
+		final List<String> lst = new LinkedList<>();
+		for (BaseChain r : roots) {
+			final String policy = r.getPolicy();
+			lst.add(String.format("%s : %s", r.getName(), policy == null ? "(default policy)" : policy));
+		}
+		return "{ " + String.join(", ", lst) + " }";
+	}
+
+	protected void collectRoots(final Set<BaseChain> roots, final Set<Chain> paths, final Set<Chain> selection,
+			final Chain chain) {
+		if (paths.contains(chain) || !selection.contains(chain))
+			return;
+		paths.add(chain);
+
+		if (chain instanceof BaseChain) {
+			roots.add((BaseChain) chain);
+			return;
+		}
+
+		final Set<Chain> sources = new LinkedHashSet<>();
+		for (Rule rule : chain.getJumpSources())
+			sources.add(rule.getChain());
+		for (Rule rule : chain.getGotoSources())
+			sources.add(rule.getChain());
+
+		for (Chain c : sources)
+			collectRoots(roots, paths, selection, c);
+	}
+
+	protected boolean ignoreRuleCheck(final Rule rule) {
+		if (this.ignoredRules.contains(rule))
+			return true;
+
+		final String content = rule.getContent();
+		final MatchOptions options = this.options.matchOptions();
+
+		if (options.ignoreIpv6Rules() && (content.startsWith("ip6") || content.startsWith("icmpv6")) //
+		) {
+			this.ignoredRules.add(rule);
+			return true;
+		}
+
+		return false;
+	}
+
+	protected boolean keepRuleCheck(final Rule rule) {
+		return !ignoreRuleCheck(rule);
 	}
 
 }

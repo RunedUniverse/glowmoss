@@ -15,6 +15,7 @@
  */
 package net.runeduniverse.tools.glowmoss.model.firewall;
 
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.Set;
@@ -28,6 +29,7 @@ import net.runeduniverse.lib.rogm.annotations.PostLoad;
 import net.runeduniverse.lib.rogm.annotations.PreSave;
 import net.runeduniverse.lib.rogm.annotations.Relationship;
 import net.runeduniverse.lib.rogm.annotations.Transient;
+import net.runeduniverse.tools.glowmoss.filter.IgnoreFilter;
 
 /*
  * Chains are containers for rules. They exist in two kinds, base chains and regular chains. A base chain is an
