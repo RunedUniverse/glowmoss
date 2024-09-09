@@ -185,40 +185,41 @@ public class FirewallModule implements ExecModule {
 
 		for (Chain chain : chains)
 			revSearch(baseChainFilter, excluded, result, includedRules, chain);
-		final Set<Chain> resultSet = new LinkedHashSet<>(result);
-		for (Chain chain : chains) {
-			if (fwdSearch(false, excluded, hideEmptyChains, resultSet, result, includedRules, chain,
-					false/* checkGotoSouce(result, chain.getGotoSources()) */))
-				valid.add(chain);
-			else
-				flagged.add(chain);
+
+		{
+			final Set<Chain> resultSet = new LinkedHashSet<>(result);
+			for (Chain chain : chains) {
+				if (fwdSearch(false, excluded, hideEmptyChains, resultSet, result, includedRules, chain))
+					valid.add(chain);
+				else
+					flagged.add(chain);
+			}
 		}
 
 		if (hideEmptyChains) {
 			for (Chain chain : flagged)
 				purgeResult(result, valid, chain);
 			// truncate simple results!
-			for (Iterator<Chain> i = result.iterator(); i.hasNext();) {
-				if (this.simpleResults.get(i.next()) != null)
+			final Set<Chain> resultSet = new LinkedHashSet<Chain>(result);
+			for (Chain chain : resultSet) {
+				computeSimpleResult(resultSet, chain);
+			}
+
+			for (Iterator<Chain> i = result.descendingIterator(); i.hasNext();) {
+				final Chain c = i.next();
+				String s = getSimpleResult(resultSet, c);
+				if (s != null) {
 					i.remove();
+				}
 			}
 		}
 
 		return result;
 	}
 
-	protected boolean checkGotoSouce(Collection<Chain> base, Collection<Rule> checks) {
-		final Set<Chain> baseSet = new LinkedHashSet<>(base);
-		for (Rule rule : checks) {
-			if (baseSet.contains(rule.getChain()))
-				return true;
-		}
-		return false;
-	}
-
 	protected boolean fwdSearch(final boolean checkContains, final Set<Chain> excluded, final boolean hideEmptyChains,
 			final Set<Chain> resultSet, final LinkedList<Chain> result, final Set<Rule> includedRules,
-			final Chain chain, final boolean isGoto) {
+			final Chain chain) {
 		if (chain == null || excluded.contains(chain))
 			return false;
 		if (checkContains && resultSet.contains(chain))
@@ -227,7 +228,6 @@ public class FirewallModule implements ExecModule {
 		final LinkedList<Chain> tmpResult = new LinkedList<>();
 		final Set<Chain> tmpResultSet = new LinkedHashSet<>(resultSet);
 
-		// since gotos do not return they always match!
 		boolean matched = false;
 		for (Rule rule : chain.getRules()) {
 			final LinkedList<Chain> partialResult = new LinkedList<>();
@@ -245,14 +245,10 @@ public class FirewallModule implements ExecModule {
 			}
 
 			boolean jumpMatch = fwdSearch(true, excluded, hideEmptyChains, nextResultSet, partialResult, includedRules,
-					rule.getJumpTo(), false);
+					rule.getJumpTo());
 
-			final Chain gotoTarget = rule.getGoTo();
-			boolean gotoMatch = false;
-			if (gotoTarget != null) {
-				gotoMatch = fwdSearch(true, excluded, hideEmptyChains, nextResultSet, partialResult, includedRules,
-						gotoTarget, true);
-			}
+			boolean gotoMatch = fwdSearch(true, excluded, hideEmptyChains, nextResultSet, partialResult, includedRules,
+					rule.getGoTo());
 
 			if (jumpMatch || gotoMatch) {
 				matched = true;
@@ -261,8 +257,6 @@ public class FirewallModule implements ExecModule {
 				includedRules.add(rule);
 			}
 		}
-
-		computeSimpleResult(resultSet, chain, this::ignoreRuleCheck);
 
 		if (matched) {
 			tmpResultSet.add(chain);
@@ -396,11 +390,9 @@ public class FirewallModule implements ExecModule {
 				} else {
 					if (includedChains.contains(targetChain))
 						skip = false;
-					else {
-						if ((note = this.simpleResults.get(targetChain)) != null) {
-							skip = false;
-						}
-
+					else if ((note = this.simpleResults.get(targetChain)) != null) {
+						skip = false;
+					} else {
 						if (skip)
 							continue;
 						skip = true;
@@ -415,7 +407,7 @@ public class FirewallModule implements ExecModule {
 			if (line != null) {
 				System.out.println(line);
 				if (note != null) {
-					System.out.println("      | >> " + note);
+					System.out.println("      |   >> " + note);
 					note = null;
 				}
 			}
@@ -424,46 +416,85 @@ public class FirewallModule implements ExecModule {
 		if (!skip && line != null) {
 			System.out.println(line);
 			if (note != null)
-				System.out.println("        >> " + note);
+				System.out.println("          >> " + note);
 		}
 	}
 
-	protected void computeSimpleResult(final Set<Chain> selection, final Chain chain, final IgnoreFilter<Rule> filter) {
+	protected void computeSimpleResult(final Set<Chain> selection, final Chain chain) {
+		if (this.simpleResults.containsKey(chain))
+			return;
+
 		final Iterator<Rule> i = chain.getRules()
 				.iterator();
+		Rule rule = null;
 		String content = null;
+		// forward to relevant rule
 		while (i.hasNext()) {
-			final Rule rule = (Rule) i.next();
-			if (filter.checkIgnore(rule))
-				continue;
-
+			rule = (Rule) i.next();
 			content = rule.getContent();
-
-			final Chain jumpTarget = rule.getJumpTo();
-			final Chain gotoTarget = rule.getGoTo();
-
-			if (jumpTarget != null && content.startsWith("jump")) {
-				content = this.simpleResults.get(jumpTarget);
+			if (keepRuleCheck(rule) && !content.startsWith("jump"))
 				break;
-			}
-			if (gotoTarget != null && content.startsWith("goto")) {
-				System.err.println("22222        " + content);
-				content = this.simpleResults.get(gotoTarget);
-				System.err.println("simple       " + content);
-				if (content == null)
-					content = getPolicyNote(selection, chain);
-				System.err.println("simple + pol " + content);
-				break;
-			}
-			if (content.startsWith("accept") || content.startsWith("drop") || content.startsWith("reject")) {
-				break;
-			}
-			content = null;
-			break;
 		}
+		if (rule == null) {
+			// no relevant rules!
+			this.simpleResults.put(chain, null);
+			return;
+		}
+
+		if (content.startsWith("accept") || content.startsWith("drop") || content.startsWith("reject")) {
+			// content is already set!
+		} else {
+			return;
+		}
+
 		// check for another rule, if the matched rule isn't last something is off!
 		// => log everything!
 		this.simpleResults.put(chain, i.hasNext() ? null : content);
+	}
+
+	protected String getSimpleResult(final Set<Chain> selection, final Chain chain) {
+		if (this.simpleResults.containsKey(chain))
+			return this.simpleResults.get(chain);
+
+		final Iterator<Rule> i = chain.getRules()
+				.iterator();
+		Rule rule = null;
+		String content = null;
+		// forward to relevant rule
+		while (i.hasNext()) {
+			rule = (Rule) i.next();
+			content = rule.getContent();
+
+			if (keepRuleCheck(rule)) {
+				final Chain jumpTarget = rule.getJumpTo();
+				if (jumpTarget != null && content.startsWith("jump")) {
+					content = this.simpleResults.get(jumpTarget);
+					if (content == null)
+						continue;
+				}
+				break;
+			}
+		}
+
+		if (rule == null) {
+			// no relevant rules!
+			return null;
+		}
+
+		final Chain gotoTarget = rule.getGoTo();
+		if (gotoTarget != null && content.startsWith("goto")) {
+			content = this.simpleResults.get(gotoTarget);
+			// if (content == null)
+			// content = getPolicyNote(selection, chain);
+			// System.err.println("simple + pol " + content);
+		} else
+			content = null;
+
+		// check for another rule, if the matched rule isn't last something is off!
+		// => log everything!
+		content = i.hasNext() ? null : content;
+		this.simpleResults.put(chain, content);
+		return content;
 	}
 
 	protected String getPolicyNote(final Set<Chain> selection, final Chain chain) {
