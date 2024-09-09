@@ -44,8 +44,8 @@ public class FirewallModule implements ExecModule {
 	private Options options;
 	private boolean modeMatch = false;
 
-	private final Set<Rule> hiddenRules = new LinkedHashSet<>();
-	private final Set<Chain> chainsWithHiddenRules = new LinkedHashSet<>();
+	private final Set<Rule> ignoredRules = new LinkedHashSet<>();
+	private final Set<Chain> chainsWithIgnoredRules = new LinkedHashSet<>();
 
 	@Override
 	public boolean handle(ListIterator<String> argPtr) throws InvalidArgumentException {
@@ -197,7 +197,7 @@ public class FirewallModule implements ExecModule {
 	}
 
 	protected boolean keepRuleCheck(final Rule rule) {
-		if (this.hiddenRules.contains(rule))
+		if (this.ignoredRules.contains(rule))
 			return false;
 
 		final String content = rule.getContent();
@@ -206,7 +206,7 @@ public class FirewallModule implements ExecModule {
 		if (!(options.ignoreIpv6Rules() && (content.startsWith("ip6") || content.startsWith("icmpv6"))))
 			return true;
 
-		this.hiddenRules.add(rule);
+		this.ignoredRules.add(rule);
 		return false;
 	}
 
@@ -227,7 +227,7 @@ public class FirewallModule implements ExecModule {
 			final Set<Chain> nextResultSet = new LinkedHashSet<>(tmpResultSet);
 
 			if (!keepRuleCheck(rule)) {
-				this.chainsWithHiddenRules.add(chain);
+				this.chainsWithIgnoredRules.add(chain);
 				continue;
 			}
 
@@ -287,7 +287,7 @@ public class FirewallModule implements ExecModule {
 					includedRules.add(rule);
 				}
 			} else {
-				this.chainsWithHiddenRules.add(rule.getChain());
+				this.chainsWithIgnoredRules.add(rule.getChain());
 			}
 		}
 		if (!matched) {
@@ -298,7 +298,7 @@ public class FirewallModule implements ExecModule {
 						includedRules.add(rule);
 					}
 				} else {
-					this.chainsWithHiddenRules.add(rule.getChain());
+					this.chainsWithIgnoredRules.add(rule.getChain());
 				}
 		}
 
