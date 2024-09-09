@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.runeduniverse.tools.glowmoss.modes.firewall;
+package net.runeduniverse.tools.glowmoss.modules.firewall;
 
 import java.util.LinkedHashSet;
 import java.util.Map;

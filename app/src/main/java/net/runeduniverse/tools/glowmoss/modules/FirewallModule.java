@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.runeduniverse.tools.glowmoss.modes;
+package net.runeduniverse.tools.glowmoss.modules;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -32,7 +32,7 @@ import net.runeduniverse.tools.glowmoss.model.firewall.Hook;
 import net.runeduniverse.tools.glowmoss.model.firewall.IngressHook;
 import net.runeduniverse.tools.glowmoss.model.firewall.Rule;
 import net.runeduniverse.tools.glowmoss.model.firewall.Table;
-import net.runeduniverse.tools.glowmoss.modes.firewall.FilteredTable;
+import net.runeduniverse.tools.glowmoss.modules.firewall.FilteredTable;
 import net.runeduniverse.tools.glowmoss.options.InvalidArgumentException;
 import net.runeduniverse.tools.glowmoss.options.MatchOptions;
 import net.runeduniverse.tools.glowmoss.options.MissingOptionException;

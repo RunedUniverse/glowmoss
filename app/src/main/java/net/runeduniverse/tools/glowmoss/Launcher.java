@@ -20,9 +20,9 @@ import java.util.ListIterator;
 import java.util.Set;
 import java.util.logging.Logger;
 
-import net.runeduniverse.tools.glowmoss.modes.ExecModule;
-import net.runeduniverse.tools.glowmoss.modes.FirewallModule;
-import net.runeduniverse.tools.glowmoss.modes.ImportModule;
+import net.runeduniverse.tools.glowmoss.modules.ExecModule;
+import net.runeduniverse.tools.glowmoss.modules.FirewallModule;
+import net.runeduniverse.tools.glowmoss.modules.ImportModule;
 import net.runeduniverse.tools.glowmoss.options.InvalidArgumentException;
 import net.runeduniverse.tools.glowmoss.options.MissingOptionException;
 import net.runeduniverse.tools.glowmoss.options.Options;
