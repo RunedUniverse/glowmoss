@@ -67,7 +67,26 @@ public class FirewallModule implements ExecModule {
 	@Override
 	public void help(ConsoleLogger logger, Options options) {
 		System.out.println(">> Glowmoss");
-		System.out.println("    firewall match --nft-ruleset <path/to/ruleset> --match-* <value> [...]");
+
+		if (this.modeMatch) {
+			System.out.println("    firewall match --nft-ruleset <path/to/ruleset> --match-* <value> [...]");
+			System.out.println("      optional:");
+			// System.out.println(" --match-value <value>");
+			System.out.println("        --match-rule-by-regex <regex>");
+			System.out.println("        --match-hook-name     <name>");
+			System.out.println("        --match-chain-type    <type>");
+			System.out.println("        --match-family        <type>");
+			System.out.println("        --show-dormant-tables");
+			System.out.println("        --hide-empty-chains");
+		} else {
+			System.out.println("    firewall <mode>");
+			System.out.println("      modes:");
+			System.out.println("        match");
+			System.out.println();
+			System.out.println("    Help:");
+			System.out.println("    $ glowmoss firewall [mode] --help");
+		}
+
 		System.out.println();
 	}
 
